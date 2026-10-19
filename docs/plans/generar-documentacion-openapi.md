@@ -39,14 +39,14 @@ Describir el funcionamiento de la API REST de Resttek en un contrato OpenAPI 3 (
 
 ## Criterios de aceptación
 
-- [ ] `docs/api/openapi.yaml` existe, declara OpenAPI 3.x y `npm run docs:lint` termina con código 0 y sin errores.
-- [ ] El contrato documenta los 29 endpoints actuales (rutas y verbos idénticos a `src/app.ts` y los `*.routes.ts`), incluyendo `/health`.
-- [ ] Cada endpoint protegido declara `bearerAuth`, el rol o roles que exige y las respuestas 401 y 403; los endpoints públicos (`auth/*`, `public/*`, `/health`) no declaran seguridad.
-- [ ] Cada endpoint con parámetros de ruta o query (`restaurantId`, `id`, `orderId`, `itemId`) los declara como obligatorios, y `POST/PUT` describen su `requestBody` con ejemplos.
-- [ ] Los enums del contrato coinciden con el código: categorías de plato (`entrante`, `principal`, `postre`, `bebida`), unidades (`kg`, `g`, `l`, `ml`, `unidad`) y estados de pedido (`pendiente`, `preparando`, `listo`, `entregado`).
-- [ ] `npm run docs:build` genera `docs/api/dist/index.html` autocontenido (un solo archivo que se abre en el navegador sin servidor) y muestra todos los endpoints.
-- [ ] El test de cobertura falla si se añade una ruta a `app` sin documentarla, y pasa con el contrato actual.
-- [ ] Los tests (`npm test`) pasan.
+- [x] `docs/api/openapi.yaml` existe, declara OpenAPI 3.x y `npm run docs:lint` termina con código 0 y sin errores.
+- [x] El contrato documenta los 29 endpoints actuales (rutas y verbos idénticos a `src/app.ts` y los `*.routes.ts`), incluyendo `/health`.
+- [x] Cada endpoint protegido declara `bearerAuth`, el rol o roles que exige y las respuestas 401 y 403; los endpoints públicos (`auth/*`, `public/*`, `/health`) no declaran seguridad.
+- [x] Cada endpoint con parámetros de ruta o query (`restaurantId`, `id`, `orderId`, `itemId`) los declara como obligatorios, y `POST/PUT` describen su `requestBody` con ejemplos.
+- [x] Los enums del contrato coinciden con el código: categorías de plato (`entrante`, `principal`, `postre`, `bebida`), unidades (`kg`, `g`, `l`, `ml`, `unidad`) y estados de pedido (`pendiente`, `preparando`, `listo`, `entregado`).
+- [x] `npm run docs:build` genera `docs/api/dist/index.html` autocontenido (un solo archivo que se abre en el navegador sin servidor) y muestra todos los endpoints.
+- [x] El test de cobertura falla si se añade una ruta a `app` sin documentarla, y pasa con el contrato actual.
+- [x] Los tests (`npm test`) pasan.
 
 ## Riesgos y notas
 

@@ -98,6 +98,19 @@ describe('OpenAPI contract', () => {
             }
         )
 
+        it('provides an example for every request body', () => {
+            const withoutExample = Object.entries(contract.paths ?? {}).flatMap(([path, item]) =>
+                Object.entries(item as Record<string, any>)
+                    .filter(([method, operation]) => HTTP_METHODS.includes(method) && operation.requestBody)
+                    .filter(([, operation]) => {
+                        const media = operation.requestBody.content['application/json']
+                        return !media.example && !media.examples
+                    })
+                    .map(([method]) => `${method} ${path}`)
+            )
+            expect(withoutExample).toEqual([])
+        })
+
         it('does not document operations that are not mounted', () => {
             const mounted = new Set(routes.map(route => `${route.method} ${route.path}`))
             const documented = Object.entries(contract.paths ?? {}).flatMap(([path, item]) =>

@@ -67,6 +67,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@resttek.com
+              password: admin@resttek.com
       responses:
         '200':
           description: Credenciales válidas
@@ -98,6 +101,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterClientRequest'
+            example:
+              firstName: Laura
+              lastName: Pérez
+              email: laura@example.org
+              password: s3creta-Pass
       responses:
         '201':
           description: Cliente registrado
@@ -130,6 +138,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEmployeeRequest'
+            example:
+              firstName: Ana
+              lastName: García
+              email: ana@resttek.com
+              password: s3creta-Pass
+              role: camarero
+              restaurantId: 7c1f0b52-1d0e-4c55-9a3e-3a1c2b9f1e10
       responses:
         '201':
           description: Empleado creado
@@ -249,6 +264,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RestaurantRequest'
+            example:
+              name: La Taberna
+              address: Calle Mayor 1, Madrid
+              email: contacto@lataberna.es
+              phone: '+34600111222'
+              ownerFirstName: Carlos
+              ownerLastName: Ruiz
+              logoUrl: null
       responses:
         '201':
           description: Restaurante creado
@@ -326,6 +349,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RestaurantRequest'
+            example:
+              name: La Taberna
+              address: Calle Mayor 1, Madrid
+              email: contacto@lataberna.es
+              phone: '+34600111222'
+              ownerFirstName: Carlos
+              ownerLastName: Ruiz
+              logoUrl: null
       responses:
         '200':
           description: Restaurante actualizado
@@ -395,6 +426,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIngredientRequest'
+            example:
+              name: Tomate
+              unit: kg
+              currentStock: 12.5
       responses:
         '201':
           description: Ingrediente creado
@@ -476,6 +511,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateIngredientRequest'
+            example:
+              name: Tomate
+              unit: kg
+              currentStock: 8
       responses:
         '200':
           description: Ingrediente actualizado
@@ -530,6 +569,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDishRequest'
+            example:
+              name: Tortilla de patatas
+              description: Con cebolla
+              price: 8.5
+              category: principal
+              available: true
+              ingredients:
+                - ingredientId: 3b5f9d2a-6c1e-4f7a-b0a4-2d8e1c9f7a33
+                  quantity: 0.2
       responses:
         '201':
           description: Plato creado
@@ -611,6 +659,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateDishRequest'
+            example:
+              name: Tortilla de patatas
+              description: Con cebolla
+              price: 9
+              category: principal
+              available: true
+              ingredients:
+                - ingredientId: 3b5f9d2a-6c1e-4f7a-b0a4-2d8e1c9f7a33
+                  quantity: 0.2
       responses:
         '200':
           description: Plato actualizado
@@ -848,6 +905,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateOrderItemStatusRequest'
+            example:
+              status: preparando
       responses:
         '204':
           description: Estado actualizado
