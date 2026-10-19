@@ -23,7 +23,7 @@ Describir el funcionamiento de la API REST de Resttek en un contrato OpenAPI 3 (
 
 > Cada tarea debe poder completarse en 5-10 minutos.
 
-1. [ ] **Leer controladores y use cases para fijar el contrato real** — `src/controllers/*`, `src/contexts/employee/infrastructure/http/*`, `src/errors/*`: apuntar body, query params, códigos de respuesta y formato de error de cada endpoint (los controladores de `order` devuelven `{ error }`, el `errorHandler` devuelve `{ error, message }`).
+1. [x] **Leer controladores y use cases para fijar el contrato real** — `src/controllers/*`, `src/contexts/employee/infrastructure/http/*`, `src/errors/*`: apuntar body, query params, códigos de respuesta y formato de error de cada endpoint (los controladores de `order` devuelven `{ error }`, el `errorHandler` devuelve `{ error, message }`).
 2. [ ] **Esqueleto del contrato** — `docs/api/openapi.yaml`: `openapi`, `info`, `servers` (`http://localhost:3000`), `tags`, `securitySchemes` (`bearerAuth` JWT) y `components.responses` reutilizables para 400/401/403/404/500.
 3. [ ] **Esquemas de modelos** — `docs/api/openapi.yaml` (`components.schemas`): `Restaurant`, `Dish` (+ `DishIngredient`, enum de categorías), `Ingredient` (enum de unidades), `Order`, `OrderItem` (enum de estados), `Employee`, `Error` y los bodies de entrada (create/update).
 4. [ ] **Endpoints `health`, `auth` y `employees`** — `docs/api/openapi.yaml` (`paths`): `GET /health`, `POST /auth/login`, `POST /auth/register`, `POST/GET /employees`, `GET /employees/{id}` y `GET /restaurants/{restaurantId}/employees`, con roles (`admin`) y respuestas.
