@@ -6,7 +6,9 @@
     "dev": "tsx watch src/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "docs:lint": "redocly lint ../../docs/api/openapi.yaml",
+    "docs:build": "redocly build-docs ../../docs/api/openapi.yaml -o ../../docs/api/dist/index.html"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
