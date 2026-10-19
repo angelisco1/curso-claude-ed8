@@ -36,13 +36,226 @@ tags:
     description: Platos de un restaurante
   - name: Orders
     description: Pedidos y estado de sus líneas
-paths: {}
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Comprobar el estado del servicio
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: El servicio está activo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      description: Devuelve un token JWT y los datos del usuario. Público.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Credenciales válidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciales inválidas (`InvalidCredentialsError`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainError'
+              example:
+                error: InvalidCredentialsError
+                message: Invalid credentials
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrar un cliente
+      description: Crea un usuario con rol `cliente` y devuelve su token JWT. Público.
+      operationId: registerClient
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterClientRequest'
+      responses:
+        '201':
+          description: Cliente registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Datos inválidos o email ya en uso (`DuplicatedEmailError`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainError'
+              example:
+                error: DuplicatedEmailError
+                message: Email is already in use
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/employees:
+    post:
+      tags: [Employees]
+      summary: Crear un empleado
+      description: 'Roles permitidos: `admin`.'
+      operationId: createEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+      responses:
+        '201':
+          description: Empleado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags: [Employees]
+      summary: Listar empleados
+      description: 'Roles permitidos: `admin`. Admite paginación por `limit`/`offset`.'
+      operationId: listEmployees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Número máximo de empleados a devolver
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Número de empleados a omitir
+        - name: role
+          in: query
+          schema:
+            $ref: '#/components/schemas/EmployeeRole'
+          description: Filtrar por rol
+      responses:
+        '200':
+          description: Lista de empleados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/employees/{id}:
+    get:
+      tags: [Employees]
+      summary: Obtener un empleado
+      description: 'Roles permitidos: `admin`.'
+      operationId: getEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/restaurants/{restaurantId}/employees:
+    get:
+      tags: [Employees]
+      summary: Listar los empleados de un restaurante
+      description: 'Roles permitidos: `admin`.'
+      operationId: listEmployeesByRestaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+      responses:
+        '200':
+          description: Empleados del restaurante
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Identificador del recurso
+    RestaurantId:
+      name: restaurantId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Identificador del restaurante
   responses:
     BadRequest:
       description: Datos inválidos o regla de dominio incumplida
