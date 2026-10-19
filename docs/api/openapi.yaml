@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: Resttek API
+  version: 1.0.0
+  description: |
+    API REST de Resttek, plataforma de gestión de restaurantes.
+
+    **Autenticación:** los endpoints protegidos requieren un token JWT en la cabecera
+    `Authorization: Bearer <token>`, obtenido en `POST /api/v1/auth/login` o
+    `POST /api/v1/auth/register`. Los endpoints bajo `/api/v1/public/...`, `/api/v1/auth/...`
+    y `/health` no requieren token.
+
+    **Roles:** `admin`, `manager`, `camarero`, `cocinero` y `cliente`. Cada operación indica los
+    roles que pueden usarla; si el rol no está permitido la API responde `403`.
+
+    **Formato de errores:** la API no usa un formato único. Los errores de dominio llegan como
+    `{ error, message }` (ver `DomainError`); los de autenticación/autorización y los de pedidos
+    llegan como `{ error }` (ver `SimpleError`).
+servers:
+  - url: http://localhost:3000
+    description: Desarrollo local
+tags:
+  - name: Health
+    description: Estado del servicio
+  - name: Auth
+    description: Login y registro de clientes
+  - name: Employees
+    description: Gestión de empleados
+  - name: Restaurants
+    description: Restaurantes (acceso autenticado)
+  - name: Public
+    description: Consultas públicas sin autenticación
+  - name: Ingredients
+    description: Ingredientes de un restaurante
+  - name: Dishes
+    description: Platos de un restaurante
+  - name: Orders
+    description: Pedidos y estado de sus líneas
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Datos inválidos o regla de dominio incumplida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DomainError'
+          example:
+            error: InvalidPriceError
+            message: Price must be a positive number
+    Unauthorized:
+      description: Token ausente, mal formado o inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: 'Unauthorized: No token provided'
+    Forbidden:
+      description: El rol del usuario no tiene permiso para esta operación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: 'Forbidden: Insufficient permissions'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DomainError'
+          example:
+            error: DishNotFoundError
+            message: Dish not found
+    InternalServerError:
+      description: Error interno inesperado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: InternalServerError
+              message:
+                type: string
+                example: Something went wrong
+  schemas: {}
