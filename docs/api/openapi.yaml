@@ -91,4 +91,388 @@ components:
               message:
                 type: string
                 example: Something went wrong
-  schemas: {}
+  schemas:
+    DomainError:
+      type: object
+      description: Error de dominio gestionado por el manejador central de errores
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          description: Nombre de la clase de error
+          example: RestaurantNotFoundError
+        message:
+          type: string
+          example: Restaurant not found
+    SimpleError:
+      type: object
+      description: Error con un único campo `error` (autenticación, autorización y pedidos)
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Order not found
+    EmployeeRole:
+      type: string
+      enum: [admin, manager, camarero, cocinero, cliente]
+    Employee:
+      type: object
+      required: [id, firstName, lastName, email, role, restaurantId]
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+          example: Ana
+        lastName:
+          type: string
+          example: García
+        email:
+          type: string
+          format: email
+          example: ana@resttek.com
+        role:
+          $ref: '#/components/schemas/EmployeeRole'
+        restaurantId:
+          type: string
+          nullable: true
+          description: Restaurante al que pertenece; `null` para admins y clientes
+    CreateEmployeeRequest:
+      type: object
+      required: [firstName, lastName, email, password, role]
+      properties:
+        firstName:
+          type: string
+          example: Ana
+        lastName:
+          type: string
+          example: García
+        email:
+          type: string
+          format: email
+          example: ana@resttek.com
+        password:
+          type: string
+          format: password
+        role:
+          $ref: '#/components/schemas/EmployeeRole'
+        restaurantId:
+          type: string
+          nullable: true
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@resttek.com
+        password:
+          type: string
+          format: password
+    RegisterClientRequest:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    AuthResponse:
+      type: object
+      required: [token, employee]
+      properties:
+        token:
+          type: string
+          description: JWT con `id`, `role` y `restaurantId` del usuario
+        employee:
+          $ref: '#/components/schemas/Employee'
+    Restaurant:
+      type: object
+      required: [id, name, address, email, phone, ownerFirstName, ownerLastName, logoUrl, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: La Taberna
+        address:
+          type: string
+          example: Calle Mayor 1, Madrid
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          example: '+34600111222'
+        ownerFirstName:
+          type: string
+        ownerLastName:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    RestaurantRequest:
+      type: object
+      required: [name, address, email, phone, ownerFirstName, ownerLastName]
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        ownerFirstName:
+          type: string
+        ownerLastName:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+    IngredientUnit:
+      type: string
+      enum: [kg, g, l, ml, unidad]
+    Ingredient:
+      type: object
+      required: [id, name, unit, currentStock, restaurantId, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Tomate
+        unit:
+          $ref: '#/components/schemas/IngredientUnit'
+        currentStock:
+          type: number
+          minimum: 0
+          example: 12.5
+        restaurantId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateIngredientRequest:
+      type: object
+      required: [name, unit]
+      properties:
+        name:
+          type: string
+        unit:
+          $ref: '#/components/schemas/IngredientUnit'
+        currentStock:
+          type: number
+          minimum: 0
+          default: 0
+    UpdateIngredientRequest:
+      type: object
+      required: [name, unit, currentStock]
+      properties:
+        name:
+          type: string
+        unit:
+          $ref: '#/components/schemas/IngredientUnit'
+        currentStock:
+          type: number
+          minimum: 0
+    DishCategory:
+      type: string
+      enum: [entrante, principal, postre, bebida]
+    DishIngredient:
+      type: object
+      required: [ingredientId, quantity]
+      properties:
+        ingredientId:
+          type: string
+        quantity:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          description: Cantidad del ingrediente por ración (en la unidad del ingrediente)
+    Dish:
+      type: object
+      required: [id, name, description, price, category, available, restaurantId, ingredients, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Tortilla de patatas
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          example: 8.5
+        category:
+          $ref: '#/components/schemas/DishCategory'
+        available:
+          type: boolean
+        restaurantId:
+          type: string
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishIngredient'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateDishRequest:
+      type: object
+      required: [name, price, category]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/DishCategory'
+        available:
+          type: boolean
+          default: true
+        ingredients:
+          type: array
+          default: []
+          items:
+            $ref: '#/components/schemas/DishIngredient'
+    UpdateDishRequest:
+      type: object
+      required: [name, price, category, available]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/DishCategory'
+        available:
+          type: boolean
+        ingredients:
+          type: array
+          default: []
+          items:
+            $ref: '#/components/schemas/DishIngredient'
+    OrderStatus:
+      type: string
+      enum: [pendiente, preparando, listo, entregado]
+    OrderItem:
+      type: object
+      required: [id, dishId, quantity, notes, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        dishId:
+          type: string
+        quantity:
+          type: integer
+          example: 1
+          description: Siempre 1; un plato pedido N veces genera N líneas
+        notes:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        dishName:
+          type: string
+          description: Solo en consultas que enriquecen el pedido con datos del plato
+        dishPrice:
+          type: number
+        dishCategory:
+          type: string
+    Order:
+      type: object
+      required: [id, restaurantId, tableId, clientId, createdAt, items]
+      properties:
+        id:
+          type: string
+          format: uuid
+        restaurantId:
+          type: string
+        tableId:
+          type: string
+          nullable: true
+        clientId:
+          type: string
+          nullable: true
+          description: Id del usuario autenticado que creó el pedido
+        createdAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        restaurantName:
+          type: string
+          description: Solo en consultas que enriquecen el pedido con datos del restaurante
+        restaurantLogoUrl:
+          type: string
+          nullable: true
+    CreateOrderRequest:
+      type: object
+      required: [restaurantId, items]
+      properties:
+        restaurantId:
+          type: string
+        tableId:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            type: object
+            required: [dishId, quantity]
+            properties:
+              dishId:
+                type: string
+              quantity:
+                type: integer
+                minimum: 1
+                description: Se expande en `quantity` líneas de pedido
+              notes:
+                type: string
+                nullable: true
+    UpdateOrderItemStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
