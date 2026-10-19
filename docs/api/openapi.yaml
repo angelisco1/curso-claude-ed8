@@ -235,6 +235,150 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/restaurants:
+    post:
+      tags: [Restaurants]
+      summary: Crear un restaurante
+      description: 'Roles permitidos: `admin`.'
+      operationId: createRestaurant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantRequest'
+      responses:
+        '201':
+          description: Restaurante creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags: [Restaurants]
+      summary: Listar restaurantes
+      description: |
+        Cualquier usuario autenticado. Un `admin` recibe todos los restaurantes; el resto de roles
+        recibe solo el restaurante de su token (lista vacía si no tienen `restaurantId`).
+      operationId: listRestaurants
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de restaurantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/restaurants/{id}:
+    get:
+      tags: [Restaurants]
+      summary: Obtener un restaurante
+      description: Cualquier usuario autenticado.
+      operationId: getRestaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Restaurante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags: [Restaurants]
+      summary: Actualizar un restaurante
+      description: 'Roles permitidos: `admin`.'
+      operationId: updateRestaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantRequest'
+      responses:
+        '200':
+          description: Restaurante actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/restaurants:
+    get:
+      tags: [Public]
+      summary: Listar todos los restaurantes (público)
+      operationId: listPublicRestaurants
+      security: []
+      responses:
+        '200':
+          description: Lista de restaurantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/restaurants/{id}:
+    get:
+      tags: [Public]
+      summary: Obtener un restaurante (público)
+      operationId: getPublicRestaurant
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Restaurante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
