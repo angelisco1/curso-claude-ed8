@@ -34,7 +34,7 @@ Describir el funcionamiento de la API REST de Resttek en un contrato OpenAPI 3 (
 9. [x] **Añadir dependencias de desarrollo** — `packages/api/package.json`: `@redocly/cli` (lint + `build-docs`, no hay solución nativa para generar el HTML) y `yaml` (para el test); `npm install`.
 10. [x] **Scripts de validación y generación** — `packages/api/package.json` y `package.json` raíz: `docs:lint` (`redocly lint ../../docs/api/openapi.yaml`) y `docs:build` (`redocly build-docs ... -o ../../docs/api/dist/index.html`); alias `docs:api` en el raíz que encadena ambos.
 11. [x] **Test de cobertura del contrato (TDD: escribirlo antes de las tareas 4-8 si se implementa con `implement-plan`)** — `packages/api/src/docs/openapi.test.ts`: parsea el YAML y comprueba que (a) es OpenAPI 3.x válido en estructura, (b) cada ruta/verbo montado en `app` figura en `paths`, (c) los endpoints protegidos declaran `security`.
-12. [ ] **Ejecutar la generación y revisar el HTML** — `docs/api/dist/index.html`: lanzar `npm run docs:api`, abrir el HTML y comprobar que muestra todos los tags, esquemas y la autenticación sin errores de lint.
+12. [x] **Ejecutar la generación y revisar el HTML** — `docs/api/dist/index.html`: lanzar `npm run docs:api`, abrir el HTML y comprobar que muestra todos los tags, esquemas y la autenticación sin errores de lint.
 13. [ ] **Documentar el uso** — `README.md` (sección API) y `CLAUDE.md` (Commands): explicar `docs:lint`, `docs:build` y la ubicación del YAML y del HTML; indicar si `docs/api/dist/` se versiona o se ignora.
 
 ## Criterios de aceptación
