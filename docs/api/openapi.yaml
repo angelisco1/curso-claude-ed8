@@ -379,6 +379,141 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/restaurants/{restaurantId}/ingredients:
+    post:
+      tags: [Ingredients]
+      summary: Crear un ingrediente
+      description: 'Roles permitidos: `admin`.'
+      operationId: createIngredient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIngredientRequest'
+      responses:
+        '201':
+          description: Ingrediente creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags: [Ingredients]
+      summary: Listar los ingredientes de un restaurante
+      description: 'Roles permitidos: `admin`, `manager`, `cocinero`.'
+      operationId: listIngredients
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+      responses:
+        '200':
+          description: Lista de ingredientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/restaurants/{restaurantId}/ingredients/{id}:
+    get:
+      tags: [Ingredients]
+      summary: Obtener un ingrediente
+      description: 'Roles permitidos: `admin`, `manager`, `cocinero`.'
+      operationId: getIngredient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Ingrediente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags: [Ingredients]
+      summary: Actualizar un ingrediente
+      description: 'Roles permitidos: `admin`.'
+      operationId: updateIngredient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIngredientRequest'
+      responses:
+        '200':
+          description: Ingrediente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags: [Ingredients]
+      summary: Eliminar un ingrediente
+      description: 'Roles permitidos: `admin`.'
+      operationId: deleteIngredient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Ingrediente eliminado
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
