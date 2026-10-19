@@ -161,6 +161,21 @@ npm test
 cd packages/api && npm run test:watch
 ```
 
+### Documentación de la API (OpenAPI)
+
+El contrato de la API está en [`docs/api/openapi.yaml`](./docs/api/openapi.yaml) (OpenAPI 3). Se mantiene a mano y un test (`packages/api/src/docs/openapi.test.ts`) falla si una ruta montada en la API no está documentada.
+
+```bash
+# Validar el contrato y generar el HTML en un solo paso
+npm run docs:api
+
+# Por separado (desde packages/api)
+npm run docs:lint     # valida docs/api/openapi.yaml
+npm run docs:build    # genera docs/api/dist/index.html
+```
+
+`docs/api/dist/` es un artefacto generado y está en `.gitignore`: se regenera con `npm run docs:api` y el fichero `index.html` es el que se publica.
+
 ---
 
 ## Problemas Comunes

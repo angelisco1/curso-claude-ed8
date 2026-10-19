@@ -16,10 +16,12 @@ npm run dev:admin          # web-admin on :4200
 npm run dev:empleados      # web-empleados on :4201
 npm run dev:clientes       # web-clientes on :4202
 npm test                   # API tests (vitest run) — the only tests wired up at root
+npm run docs:api           # lint docs/api/openapi.yaml and build docs/api/dist/index.html (generated, git-ignored)
 ```
 
 - Single test file / name: `cd packages/api && npx vitest run src/services/order.service.test.ts` or `npx vitest run -t "test name"`. Watch mode: `npm run test:watch` in `packages/api`.
 - Frontends: `npm run build -w @resttek/web-admin` (same for the others). No lint script exists, and the frontends have no test script at the root.
+- API contract: `docs/api/openapi.yaml` is hand-written; `packages/api/src/docs/openapi.test.ts` fails when a route mounted in `app.ts` is missing from it, so update the YAML whenever you add or change an endpoint.
 - Seeded users: password equals the email (e.g. `admin@resttek.com`); full list in README.md.
 
 ## Architecture
