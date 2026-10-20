@@ -93,7 +93,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 1. [x] **Modelos** — `core/models/discount.model.ts` (`Bill`, `PointsRule`, `PointsInfo`, `BillErrorReason`) y ampliar `core/models/order.model.ts` con `bill?`.
 2. [x] **Servicio de puntos** — `core/services/points.service.ts`: `GET .../points/me`.
 3. [x] **Servicio de cuenta** — ampliar `core/services/order.service.ts`: `previewBill(orderId, {code?, pointsRuleId?})` y `requestBill(...)`.
-4. [ ] **Store de cuenta** — `core/store/bill.store.ts` con signals: modo (código o puntos, excluyentes), código, tramo elegido, resumen y error. Los importes salen del servidor.
+4. [x] **Store de cuenta** — `core/store/bill.store.ts` con signals: modo (código o puntos, excluyentes), código, tramo elegido, resumen y error. Los importes salen del servidor.
 5. [ ] **Pedir la cuenta: resumen** — `features/orders/order-detail.component.ts`: botón «Pedir la cuenta» y resumen con subtotal, descuento y total.
 6. [ ] **Aplicar código** — mismo componente (o extraer `bill-request.component.ts`): input de código con «Aplicar», previsualización y mensajes por `reason` (inválido, caducado, agotado, mínimo).
 7. [ ] **Canjear puntos** — selector de tramos con saldo y equivalencias («100 pts = 10 €»), deshabilitando los tramos que superan el saldo; alterna con el código.
