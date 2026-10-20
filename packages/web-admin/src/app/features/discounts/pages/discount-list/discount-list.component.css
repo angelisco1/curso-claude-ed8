@@ -1,0 +1,20 @@
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.code-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.stock-ok {
+  color: var(--green-light);
+  font-weight: 600;
+}
+
+.stock-zero {
+  color: var(--red);
+  font-weight: 600;
+}
