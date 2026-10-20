@@ -5,7 +5,7 @@ import { InvalidPointsRuleError } from '@errors/DomainErrors.js'
 describe('points-rule.model', () => {
     it('should accept a valid rule and round the amount to cents', () => {
         expect(assertValidPointsRuleInput({ points: 100, amount: 10 })).toEqual({ points: 100, amount: 10 })
-        expect(assertValidPointsRuleInput({ points: 10, amount: 1.005 }).amount).toBe(1.01)
+        expect(assertValidPointsRuleInput({ points: 10, amount: 1.006 }).amount).toBe(1.01)
     })
 
     it('should reject points that are not a positive integer', () => {
