@@ -1358,6 +1358,70 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/DiscountNotFound' }
+  /api/v1/restaurants/{restaurantId}/clients/{clientId}/points:
+    put:
+      tags: [Discounts]
+      summary: Fijar el saldo de puntos de un cliente
+      description: |
+        Roles: `admin`, `manager` (del restaurante; `admin` accede a cualquiera). Fija el saldo
+        (no suma): los puntos no se acumulan automáticamente. `clientId` debe ser un usuario con rol `cliente`.
+      operationId: setClientPoints
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+        - name: clientId
+          in: path
+          required: true
+          schema: { type: string }
+          description: Identificador del cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [balance]
+              properties:
+                balance: { type: integer, minimum: 0, description: Nuevo saldo de puntos }
+            example: { balance: 150 }
+      responses:
+        '200':
+          description: Saldo actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClientPointsBalance' }
+        '400': { $ref: '#/components/responses/DiscountBadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Restaurante o cliente no encontrados (`RestaurantNotFoundError`, `EmployeeNotFoundError`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DomainError' }
+              example: { error: EmployeeNotFoundError, message: Employee not found }
+  /api/v1/restaurants/{restaurantId}/points/me:
+    get:
+      tags: [Discounts]
+      summary: Saldo de puntos del cliente autenticado y tramos del restaurante
+      description: 'Rol: `cliente`. Devuelve 0 si el cliente no tiene saldo en el restaurante.'
+      operationId: getMyPoints
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/RestaurantId'
+      responses:
+        '200':
+          description: Saldo y tramos canjeables, ordenados por `points`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PointsInfo' }
+              example:
+                balance: 120
+                rules:
+                  - { id: 3f2b8c1e-0000-4000-8000-000000000001, points: 10, amount: 1 }
+                  - { id: 3f2b8c1e-0000-4000-8000-000000000002, points: 100, amount: 10 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
 components:
   securitySchemes:
     bearerAuth:
@@ -1924,3 +1988,24 @@ components:
           properties:
             id: { type: string, format: uuid }
             restaurantId: { type: string }
+    ClientPointsBalance:
+      type: object
+      required: [clientId, restaurantId, balance]
+      properties:
+        clientId: { type: string }
+        restaurantId: { type: string }
+        balance: { type: integer, minimum: 0 }
+    PointsInfo:
+      type: object
+      required: [balance, rules]
+      properties:
+        balance: { type: integer, minimum: 0 }
+        rules:
+          type: array
+          items:
+            type: object
+            required: [id, points, amount]
+            properties:
+              id: { type: string, format: uuid }
+              points: { type: integer }
+              amount: { type: number }

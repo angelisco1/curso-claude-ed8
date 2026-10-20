@@ -54,7 +54,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 ### Fase 0 — Contrato (previa, bloquea a las demás)
 
 1. [x] **Documentar el contrato de códigos y tramos** — `docs/api/openapi.yaml`: paths y schemas de `discount-codes` y `points-rules` con `security`, respuesta 401, y `example` en cada requestBody.
-2. [x] **Documentar saldo y cuenta** — `docs/api/openapi.yaml`: `PUT .../points`, `GET .../points/me`, `GET/POST /orders/{id}/bill`, con los errores y `reason` de la tabla.
+2. [ ] **Documentar saldo y cuenta** — `docs/api/openapi.yaml`: `PUT .../points`, `GET .../points/me`, `GET/POST /orders/{id}/bill`, con los errores y `reason` de la tabla.
 
 > El test `openapi.test.ts` fallará hasta que se monten las rutas en la Fase A; es esperado en esta fase. Si se prefiere, las tareas 1-2 pueden hacerse junto a A5/A12 y dejar aquí solo el acuerdo del contrato.
 
@@ -68,7 +68,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 6. [x] **Rutas de códigos** — `src/controllers/`, `src/routes/discount-code.routes.ts` y `src/app.ts`: montaje en `/api/v1/restaurants/:restaurantId/discount-codes` con `authorize` y comprobación de `restaurantId`.
 7. [x] **Tramos de puntos: modelo, migración y repositorio** — tabla `points_rules` con índice único `(restaurant_id, points)`, repositorio y mock.
 8. [x] **Tramos de puntos: servicio y rutas** — servicio con test, controller, routes y montaje en `app.ts`.
-9. [ ] **Saldo de puntos** — tabla `client_points(client_id, restaurant_id, balance)`, repositorio, servicio con test, `PUT .../clients/:clientId/points` y `GET .../points/me`.
+9. [x] **Saldo de puntos** — tabla `client_points(client_id, restaurant_id, balance)`, repositorio, servicio con test, `PUT .../clients/:clientId/points` y `GET .../points/me`.
 10. [ ] **Tabla de cuentas** — migración y repositorio de `order_bills(order_id UNIQUE, subtotal, code_id, discount, points_used, total, created_at)` con mock.
 11. [ ] **Servicio de cuenta: previsualizar** — `src/services/bill.service.ts` + tests: calcula subtotal con `dishPrice` de las líneas, valida código (activo, vigencia, usos, mínimo) o tramo (saldo), rechaza código+puntos a la vez.
 12. [ ] **Servicio de cuenta: confirmar** — `bill.service.ts` + tests: transacción que guarda la cuenta, incrementa `uses` o resta puntos; 409 si ya existe.
