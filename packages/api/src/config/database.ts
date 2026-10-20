@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename)
 export class Database {
     private db: sqlite3.Database | null = null
     private dbPath: string
+    private transactionQueue: Promise<unknown> = Promise.resolve()
 
     constructor() {
         const env = process.env.NODE_ENV || 'development'
@@ -70,6 +71,28 @@ export class Database {
                 resolve(row as T)
             })
         })
+    }
+
+    /**
+     * Runs `work` inside BEGIN IMMEDIATE / COMMIT, rolling back if it throws.
+     * There is a single connection, so transactions are serialized to keep
+     * statements of different requests from interleaving inside one of them.
+     */
+    public transaction<T>(work: () => Promise<T>): Promise<T> {
+        const execute = async (): Promise<T> => {
+            await this.run('BEGIN IMMEDIATE')
+            try {
+                const result = await work()
+                await this.run('COMMIT')
+                return result
+            } catch (error) {
+                await this.run('ROLLBACK')
+                throw error
+            }
+        }
+        const result = this.transactionQueue.then(execute, execute)
+        this.transactionQueue = result.catch(() => undefined)
+        return result
     }
 
     public async close(): Promise<void> {
@@ -177,7 +200,59 @@ export class Database {
                 FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_mesas_restaurant_numero ON mesas(restaurant_id, numero)
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_mesas_restaurant_numero ON mesas(restaurant_id, numero);
+
+            CREATE TABLE IF NOT EXISTS discount_codes (
+                id TEXT PRIMARY KEY,
+                restaurant_id TEXT NOT NULL,
+                code TEXT NOT NULL COLLATE NOCASE,
+                type TEXT NOT NULL,
+                value REAL NOT NULL,
+                min_order REAL,
+                valid_from TEXT,
+                valid_until TEXT,
+                max_uses INTEGER,
+                uses INTEGER NOT NULL DEFAULT 0,
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_discount_codes_restaurant_code ON discount_codes(restaurant_id, code);
+
+            CREATE TABLE IF NOT EXISTS points_rules (
+                id TEXT PRIMARY KEY,
+                restaurant_id TEXT NOT NULL,
+                points INTEGER NOT NULL,
+                amount REAL NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_points_rules_restaurant_points ON points_rules(restaurant_id, points);
+
+            CREATE TABLE IF NOT EXISTS client_points (
+                client_id TEXT NOT NULL,
+                restaurant_id TEXT NOT NULL,
+                balance INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY(client_id, restaurant_id),
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS order_bills (
+                order_id TEXT NOT NULL UNIQUE,
+                subtotal INTEGER NOT NULL,
+                code_id TEXT,
+                code TEXT,
+                discount INTEGER NOT NULL DEFAULT 0,
+                points_used INTEGER NOT NULL DEFAULT 0,
+                total INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
+                FOREIGN KEY(code_id) REFERENCES discount_codes(id) ON DELETE SET NULL
+            )
         `.split(';')
 
         for (const q of queries) {
