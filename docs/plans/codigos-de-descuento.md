@@ -91,7 +91,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 ### Fase C — web-clientes (`packages/web-clientes`)
 
 1. [x] **Modelos** — `core/models/discount.model.ts` (`Bill`, `PointsRule`, `PointsInfo`, `BillErrorReason`) y ampliar `core/models/order.model.ts` con `bill?`.
-2. [ ] **Servicio de puntos** — `core/services/points.service.ts`: `GET .../points/me`.
+2. [x] **Servicio de puntos** — `core/services/points.service.ts`: `GET .../points/me`.
 3. [ ] **Servicio de cuenta** — ampliar `core/services/order.service.ts`: `previewBill(orderId, {code?, pointsRuleId?})` y `requestBill(...)`.
 4. [ ] **Store de cuenta** — `core/store/bill.store.ts` con signals: modo (código o puntos, excluyentes), código, tramo elegido, resumen y error. Los importes salen del servidor.
 5. [ ] **Pedir la cuenta: resumen** — `features/orders/order-detail.component.ts`: botón «Pedir la cuenta» y resumen con subtotal, descuento y total.
