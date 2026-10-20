@@ -1,19 +1,20 @@
 ---
 name: implement-plan
-description: Implementa un plan de `docs/plans/` (generado con plan-feature) en un git worktree aislado, tarea a tarea y con TDD estricto. Tras cada tarea y sus tests hace un commit y marca la tarea como hecha en el plan, hasta completar todas y cumplir los criterios de aceptación. Úsala cuando el usuario pida "implementar el plan", "ejecutar el plan" o invoque /implement-plan.
-argument-hint: <ruta o slug del plan, p. ej. docs/plans/error-middleware-refactor.md>
+description: Implementa el plan de una issue de GitHub (generado con plan-feature) en un git worktree aislado, tarea a tarea y con TDD estricto. El usuario indica el número de issue y la skill la busca en GitHub. Tras cada tarea y sus tests hace un commit y marca la tarea como hecha en el plan, hasta completar todas y cumplir los criterios de aceptación. Al terminar deja la PR creada y envía por Slack el enlace directo a la PR. Úsala cuando el usuario pida "implementar el plan", "ejecutar el plan", "implementar la issue" o invoque /implement-plan.
+argument-hint: <número de issue de GitHub>
 ---
 
 # implement-plan
 
-Implementa el plan: $ARGUMENTS
+Implementa el plan de la issue de GitHub: $ARGUMENTS
 
 ## Instrucciones
 
 ### 1. Localiza y valida el plan
 
-- Resuelve `$ARGUMENTS` a un archivo de `docs/plans/` (acepta ruta completa, nombre de archivo o slug). Si no se indica nada, lista `docs/plans/` y pregunta cuál con `AskUserQuestion`. Si no existe, díselo al usuario y para.
-- Lee el plan completo y `CLAUDE.md`. Respeta la arquitectura por capas, las convenciones (clases con métodos en `snake_case`, `HttpError`, SQLite con `node:sqlite`) y la regla de no añadir dependencias si existe solución nativa. Si alguna tarea implica paginación, lee antes `docs/api/api-pagination.md`.
+- El usuario indica en `$ARGUMENTS` el número de la issue a implementar. Si no lo ha indicado, pídeselo con `AskUserQuestion`. Búscala en GitHub con `gh issue view <número> --comments` (o `--json title,body,labels,comments`). Si la issue no existe o `gh` falla, díselo al usuario y para.
+- El plan es el comentario de la issue publicado por `plan-feature` (el más reciente si hay varios). Resuélvelo a su archivo de `docs/plans/` (por título o slug). Si el archivo no existe en el repo, créalo con el contenido del comentario en `docs/plans/<slug-kebab-case>.md`. Si la issue no tiene ningún plan, díselo al usuario, sugiere ejecutar `/plan-feature <número>` y para.
+- Lee la issue, el plan completo y `CLAUDE.md`. Respeta la arquitectura por capas, las convenciones (clases con métodos en `snake_case`, `HttpError`, SQLite con `node:sqlite`) y la regla de no añadir dependencias si existe solución nativa. Si alguna tarea implica paginación, lee antes `docs/api/api-pagination.md`.
 - Si hay tareas ya marcadas `[x]`, trátalas como hechas y continúa por la primera pendiente.
 - Si el plan tiene decisiones pendientes o ambigüedades que cambien la implementación, resuélvelas con `AskUserQuestion` antes de empezar. No preguntes lo que puedas resolver leyendo el código.
 
@@ -24,7 +25,7 @@ Todo el trabajo se hace en un worktree, nunca en el directorio principal.
 1. Comprueba que estás en un repo git. Si el worktree de este plan ya existe (reanudación), reutilízalo en vez de crear otro.
 2. Crea la rama y el worktree dentro de `.claude/worktrees/`, partiendo de la rama actual:
    `git worktree add .claude/worktrees/<slug> -b <tipo>/<slug>`
-   donde `<slug>` es el nombre del plan y `<tipo>` es `feat`, `fix` o `refactor` según el campo **Tipo** del plan. (Alternativa equivalente: la tool `EnterWorktree`.) Comprueba que `.claude/worktrees/` está en `.gitignore`; si no, avisa al usuario en vez de modificarlo por tu cuenta.
+   donde `<slug>` es el nombre del plan (sin versionar o creado desde la issue, según el caso) y `<tipo>` es `feat`, `fix` o `refactor` según el campo **Tipo** del plan. (Alternativa equivalente: la tool `EnterWorktree`.) Comprueba que `.claude/worktrees/` está en `.gitignore`; si no, avisa al usuario en vez de modificarlo por tu cuenta.
 3. Trabaja desde el worktree a partir de aquí (usa rutas absolutas dentro de él).
 4. Prepara el entorno: copia el `.env` del directorio principal si existe (está en `.gitignore`) y ejecuta `npm install`.
 5. Si el plan está sin versionar (`git status` lo muestra como `??`), cópialo al mismo path dentro del worktree; entrará en el primer commit. A partir de ahora **la copia del worktree es la única que se edita**.
@@ -64,7 +65,7 @@ No uses la skill `commit` (pide confirmación en cada commit y aquí el flujo es
 - Tipos: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`... según lo que haga la tarea. Ámbito: capa o módulo afectado.
 - Haz `git add` solo de los archivos de la tarea (nunca `.env` ni secretos).
 - Termina el mensaje con la línea de atribución indicada en las instrucciones de la sesión, si la hay. Usa un HEREDOC.
-- No hagas `git push`, ni `--amend`, ni `--no-verify`.
+- No hagas `--amend` ni `--no-verify`. El único `git push` permitido es el del paso 6, para crear la PR.
 
 ### 5. Verifica los criterios de aceptación
 
@@ -74,10 +75,20 @@ Cuando todas las tareas estén en `[x]`:
 2. Marca `[x]` cada criterio cumplido. Si alguno no se cumple, corrígelo siguiendo el mismo ciclo TDD (nuevo test rojo → código → commit) y vuelve a verificar. No marques un criterio sin haberlo comprobado.
 3. Haz un último commit con el plan actualizado (`docs(plans): mark acceptance criteria as met`) si quedaron cambios sin commitear.
 
-### 6. Avisa por Slack
+### 6. Crea la PR
 
-Cuando todas las tareas estén en `[x]` y los criterios de aceptación verificados, publica un mensaje en el canal `revisar-plan` con la herramienta `mcp__slack__slack_post_message` (cárgala antes con `ToolSearch` si no está disponible; si necesitas el ID del canal, búscalo con `mcp__slack__slack_list_channels`). El mensaje debe indicar que la implementación está lista para revisarse e incluir el nombre del plan, la rama y la ruta del worktree. Si el canal no existe o el envío falla, no abandones: menciónalo en el resumen final.
+Cuando todas las tareas estén en `[x]` y los criterios de aceptación verificados:
 
-### 7. Cierra
+1. Comprueba que el árbol del worktree está limpio y que `npm test` pasa.
+2. Sube la rama: `git push -u origin <tipo>/<slug>`.
+3. Crea la PR con `gh pr create --base <rama base> --head <tipo>/<slug>` (la rama base es aquella de la que partió el worktree). El título sigue Conventional Commits, en inglés, y el cuerpo (en inglés) incluye un resumen del cambio, las tareas completadas, el estado de los criterios de aceptación y `Closes #<número>` para enlazar la issue. Usa un HEREDOC y termina el cuerpo con la línea de atribución indicada en las instrucciones de la sesión, si la hay.
+4. Guarda la URL que devuelve `gh pr create` (si ya existía una PR para la rama, recupérala con `gh pr view --json url`).
+5. Si el push o la creación fallan, no abandones: informa del fallo y del motivo en el resumen final y omite el envío del paso 7 si no hay PR.
 
-Muestra al usuario un resumen: rama y ruta del worktree, lista de commits (`git log --oneline`), estado de los criterios de aceptación y cualquier incidencia (línea base rota, tareas sin TDD, decisiones tomadas). Indica que el trabajo está en la rama del worktree sin mergear ni pushear, y pregunta cómo quiere integrarlo (merge, PR o revisar antes). No hagas merge, push ni elimines el worktree sin su confirmación.
+### 7. Avisa por Slack
+
+Con la PR creada, publica un mensaje en el canal `revisar-plan` con la herramienta `mcp__slack__slack_post_message` (cárgala antes con `ToolSearch` si no está disponible; si necesitas el ID del canal, búscalo con `mcp__slack__slack_list_channels`). El mensaje debe indicar que la implementación está lista para revisarse e incluir el número de la issue, el nombre del plan y el **enlace directo a la PR** (la URL completa). Si el canal no existe o el envío falla, no abandones: menciónalo en el resumen final.
+
+### 8. Cierra
+
+Muestra al usuario un resumen: enlace a la PR, rama y ruta del worktree, lista de commits (`git log --oneline`), estado de los criterios de aceptación y cualquier incidencia (línea base rota, tareas sin TDD, decisiones tomadas). No hagas merge de la PR ni elimines el worktree sin su confirmación.
