@@ -1,3 +1,5 @@
+import { Bill } from './discount.model'
+
 export interface OrderItem {
   id: string
   dishId: string
@@ -17,4 +19,5 @@ export interface Order {
   clientId: string | null
   createdAt: string
   items: OrderItem[]
+  bill?: Bill
 }

@@ -126,6 +126,9 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
   readonly orders = signal<Order[]>([])
   readonly loading = signal(true)
   readonly error = signal<string | null>(null)
+  /** Server totals of orders whose bill carries a discount, by order id. */
+  private readonly billTotals = signal<Record<string, number>>({})
+  private readonly checkedBills = new Set<string>()
 
   ngOnInit(): void {
     this.loadOrders()
@@ -144,12 +147,29 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
       next: (orders) => {
         this.orders.set(orders)
         this.loading.set(false)
+        this.loadBillTotals(orders)
       },
       error: () => {
         this.error.set('Error al cargar los pedidos')
         this.loading.set(false)
       }
     })
+  }
+
+  private loadBillTotals(orders: Order[]): void {
+    for (const order of orders) {
+      if (this.checkedBills.has(order.id)) continue
+      this.checkedBills.add(order.id)
+      // Returns the saved bill when there is one; otherwise a plain preview equal to the local sum.
+      this.orderService.previewBill(order.id).subscribe({
+        next: bill => {
+          if (bill.discount > 0 || bill.pointsUsed > 0) {
+            this.billTotals.update(totals => ({ ...totals, [order.id]: bill.total }))
+          }
+        },
+        error: () => this.checkedBills.delete(order.id)
+      })
+    }
   }
 
   getMainStatus(order: Order): string {
@@ -170,6 +190,8 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
   }
 
   getOrderTotal(order: Order): number {
+    const billTotal = this.billTotals()[order.id]
+    if (billTotal !== undefined) return billTotal
     return order.items.reduce((sum, item) => sum + (item.dishPrice || 0) * item.quantity, 0)
   }
 }
