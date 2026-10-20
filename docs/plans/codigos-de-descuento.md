@@ -69,7 +69,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 7. [x] **Tramos de puntos: modelo, migración y repositorio** — tabla `points_rules` con índice único `(restaurant_id, points)`, repositorio y mock.
 8. [x] **Tramos de puntos: servicio y rutas** — servicio con test, controller, routes y montaje en `app.ts`.
 9. [x] **Saldo de puntos** — tabla `client_points(client_id, restaurant_id, balance)`, repositorio, servicio con test, `PUT .../clients/:clientId/points` y `GET .../points/me`.
-10. [ ] **Tabla de cuentas** — migración y repositorio de `order_bills(order_id UNIQUE, subtotal, code_id, discount, points_used, total, created_at)` con mock.
+10. [x] **Tabla de cuentas** — migración y repositorio de `order_bills(order_id UNIQUE, subtotal, code_id, discount, points_used, total, created_at)` con mock.
 11. [ ] **Servicio de cuenta: previsualizar** — `src/services/bill.service.ts` + tests: calcula subtotal con `dishPrice` de las líneas, valida código (activo, vigencia, usos, mínimo) o tramo (saldo), rechaza código+puntos a la vez.
 12. [ ] **Servicio de cuenta: confirmar** — `bill.service.ts` + tests: transacción que guarda la cuenta, incrementa `uses` o resta puntos; 409 si ya existe.
 13. [ ] **Endpoints de cuenta** — `order.routes.ts`, controller: `GET/POST /orders/:id/bill`, comprobando que el pedido pertenece al cliente del JWT.

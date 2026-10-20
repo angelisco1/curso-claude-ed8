@@ -216,6 +216,19 @@ export class Database {
                 balance INTEGER NOT NULL DEFAULT 0,
                 PRIMARY KEY(client_id, restaurant_id),
                 FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS order_bills (
+                order_id TEXT NOT NULL UNIQUE,
+                subtotal INTEGER NOT NULL,
+                code_id TEXT,
+                code TEXT,
+                discount INTEGER NOT NULL DEFAULT 0,
+                points_used INTEGER NOT NULL DEFAULT 0,
+                total INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
+                FOREIGN KEY(code_id) REFERENCES discount_codes(id) ON DELETE SET NULL
             )
         `.split(';')
 
