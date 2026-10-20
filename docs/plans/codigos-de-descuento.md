@@ -81,7 +81,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 
 1. [x] **Modelos** — `features/discounts/models/discount-code.model.ts` y `points-rule.model.ts`: interfaces y DTOs según el contrato.
 2. [x] **Servicios HTTP** — `features/discounts/services/discount-code.service.ts` y `points-rule.service.ts`.
-3. [ ] **Stores** — `features/discounts/store/discount-code.store.ts` y `points-rule.store.ts` con signals (`_items`, `_loading`, `_error`).
+3. [x] **Stores** — `features/discounts/store/discount-code.store.ts` y `points-rule.store.ts` con signals (`_items`, `_loading`, `_error`).
 4. [ ] **Lista de códigos** — `pages/discount-list/`: tabla con estados de carga, error y vacío; borrado con confirmación; columnas código, tipo, valor, vigencia, usos y activo.
 5. [ ] **Formulario de códigos** — `pages/discount-form/`: crear/editar con validación de tipo/valor y fechas; muestra el 409 de código duplicado.
 6. [ ] **Pantalla de tramos de puntos** — `pages/points-rules/`: tabla editable de tramos (añadir, editar, borrar) con el 409 de puntos repetidos.
