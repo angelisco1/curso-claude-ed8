@@ -26,6 +26,10 @@ import { BillStore } from '../../core/store/bill.store'
         <div class="mode-tabs">
           <button class="btn btn-secondary" [class.active]="store.mode() === 'code'"
             (click)="store.setMode(store.mode() === 'code' ? 'none' : 'code')">Tengo un código</button>
+          @if (store.rules().length > 0) {
+            <button class="btn btn-secondary" [class.active]="store.mode() === 'points'"
+              (click)="store.setMode(store.mode() === 'points' ? 'none' : 'points')">Canjear puntos</button>
+          }
         </div>
 
         @if (store.mode() === 'code') {
@@ -35,6 +39,18 @@ import { BillStore } from '../../core/store/bill.store'
             <button type="submit" class="btn btn-secondary" [disabled]="store.loading()">Aplicar</button>
           </form>
         }
+      }
+
+      @if (!store.requested() && store.mode() === 'points') {
+        <div class="points">
+          <p class="points-balance">Tu saldo: <strong>{{ store.balance() }} pts</strong></p>
+          @for (rule of store.rules(); track rule.id) {
+            <button class="btn btn-secondary rule" [class.active]="store.selectedRuleId() === rule.id"
+              [disabled]="rule.points > store.balance() || store.loading()" (click)="store.selectRule(rule.id)">
+              {{ rule.points }} pts = {{ rule.amount | number:'1.2-2' }} €
+            </button>
+          }
+        </div>
       }
 
       @if (store.error()) {
@@ -67,6 +83,19 @@ import { BillStore } from '../../core/store/bill.store'
       gap: 8px;
     }
     .mode-tabs .active {
+      border-color: var(--green-medium);
+      color: var(--green-light);
+    }
+    .points {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .points-balance {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .rule.active {
       border-color: var(--green-medium);
       color: var(--green-light);
     }
