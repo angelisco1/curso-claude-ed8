@@ -98,7 +98,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 6. [x] **Aplicar código** — mismo componente (o extraer `bill-request.component.ts`): input de código con «Aplicar», previsualización y mensajes por `reason` (inválido, caducado, agotado, mínimo).
 7. [x] **Canjear puntos** — selector de tramos con saldo y equivalencias («100 pts = 10 €»), deshabilitando los tramos que superan el saldo; alterna con el código.
 8. [x] **Totales coherentes** — `features/orders/my-orders.component.ts` y `order-detail.component.ts`: usar el total de la cuenta si existe, y la suma local si no.
-9. [ ] **Verificación** — `npm run build -w @resttek/web-clientes` sin errores y prueba manual de extremo a extremo con la API real.
+9. [x] **Verificación** — `npm run build -w @resttek/web-clientes` sin errores y prueba manual de extremo a extremo con la API real.
 
 ## Criterios de aceptación
 
@@ -109,7 +109,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 - [x] Enviar código y tramo a la vez devuelve 400; código caducado, agotado, inactivo, bajo el mínimo o saldo insuficiente devuelve 422 con su `reason`.
 - [x] Pedir la cuenta de un pedido ajeno devuelve 403/404 y pedirla dos veces devuelve 409.
 - [ ] En web-admin se gestionan códigos y tramos desde el menú del restaurante.
-- [ ] En web-clientes el cliente puede pedir la cuenta, aplicar un código o canjear un tramo, ve el descuento y el total, y recibe mensajes claros ante los errores.
+- [x] En web-clientes el cliente puede pedir la cuenta, aplicar un código o canjear un tramo, ve el descuento y el total, y recibe mensajes claros ante los errores.
 - [x] `docs/api/openapi.yaml` documenta todos los endpoints nuevos y `npm test` pasa (incluido `openapi.test.ts`).
 - [ ] `npm run build` pasa en `web-admin` y `web-clientes`.
 
