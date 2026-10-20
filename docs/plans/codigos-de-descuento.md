@@ -79,13 +79,13 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 
 Toma como modelo la feature de mesas (`features/tables/`).
 
-1. [ ] **Modelos** — `features/discounts/models/discount-code.model.ts` y `points-rule.model.ts`: interfaces y DTOs según el contrato.
-2. [ ] **Servicios HTTP** — `features/discounts/services/discount-code.service.ts` y `points-rule.service.ts`.
-3. [ ] **Stores** — `features/discounts/store/discount-code.store.ts` y `points-rule.store.ts` con signals (`_items`, `_loading`, `_error`).
-4. [ ] **Lista de códigos** — `pages/discount-list/`: tabla con estados de carga, error y vacío; borrado con confirmación; columnas código, tipo, valor, vigencia, usos y activo.
-5. [ ] **Formulario de códigos** — `pages/discount-form/`: crear/editar con validación de tipo/valor y fechas; muestra el 409 de código duplicado.
-6. [ ] **Pantalla de tramos de puntos** — `pages/points-rules/`: tabla editable de tramos (añadir, editar, borrar) con el 409 de puntos repetidos.
-7. [ ] **Navegación** — `discounts.routes.ts` (`''`, `'new'`, `':id/edit'`, `'points'`), bloque en `app.routes.ts`, enlace «Descuentos» en `core/layout/shell.component.html`, icono en las dos listas de `app.config.ts` y tarjeta en el dashboard del restaurante.
+1. [x] **Modelos** — `features/discounts/models/discount-code.model.ts` y `points-rule.model.ts`: interfaces y DTOs según el contrato.
+2. [x] **Servicios HTTP** — `features/discounts/services/discount-code.service.ts` y `points-rule.service.ts`.
+3. [x] **Stores** — `features/discounts/store/discount-code.store.ts` y `points-rule.store.ts` con signals (`_items`, `_loading`, `_error`).
+4. [x] **Lista de códigos** — `pages/discount-list/`: tabla con estados de carga, error y vacío; borrado con confirmación; columnas código, tipo, valor, vigencia, usos y activo.
+5. [x] **Formulario de códigos** — `pages/discount-form/`: crear/editar con validación de tipo/valor y fechas; muestra el 409 de código duplicado.
+6. [x] **Pantalla de tramos de puntos** — `pages/points-rules/`: tabla editable de tramos (añadir, editar, borrar) con el 409 de puntos repetidos.
+7. [x] **Navegación** — `discounts.routes.ts` (`''`, `'new'`, `':id/edit'`, `'points'`), bloque en `app.routes.ts`, enlace «Descuentos» en `core/layout/shell.component.html`, icono en las dos listas de `app.config.ts` y tarjeta en el dashboard del restaurante.
 8. [ ] **Verificación** — `npm run build -w @resttek/web-admin` sin errores y prueba manual con la API real (`npm run dev:admin`).
 
 ### Fase C — web-clientes (`packages/web-clientes`)

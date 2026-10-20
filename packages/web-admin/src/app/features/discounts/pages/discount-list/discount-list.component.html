@@ -1,0 +1,74 @@
+<div class="fade-in">
+  <div class="page-header">
+    <h1>Códigos de descuento</h1>
+    <div class="header-actions">
+      <a [routerLink]="['points']" class="btn btn-secondary">
+        <lucide-icon name="star" [size]="16"></lucide-icon>
+        Tramos de puntos
+      </a>
+      <a [routerLink]="['new']" class="btn btn-primary">
+        <lucide-icon name="plus" [size]="16"></lucide-icon>
+        Nuevo código
+      </a>
+    </div>
+  </div>
+
+  @if (store.loading()) {
+    <div class="spinner"></div>
+  } @else if (store.error()) {
+    <div class="alert-error">{{ store.error() }}</div>
+  } @else if (store.items().length === 0) {
+    <div class="empty-state card">
+      <lucide-icon name="ticket" [size]="40"></lucide-icon>
+      <p>No hay códigos de descuento para este restaurante</p>
+    </div>
+  } @else {
+    <div class="card table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Vigencia</th>
+            <th>Usos</th>
+            <th>Activo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of store.items(); track c.id) {
+            <tr>
+              <td class="code-name">{{ c.code }}</td>
+              <td>{{ c.type === 'percent' ? 'Porcentaje' : 'Importe fijo' }}</td>
+              <td>{{ formatValue(c) }}</td>
+              <td>
+                @if (c.validFrom || c.validUntil) {
+                  {{ c.validFrom ? (c.validFrom | date: 'dd/MM/yyyy') : '...' }}
+                  &ndash;
+                  {{ c.validUntil ? (c.validUntil | date: 'dd/MM/yyyy') : '...' }}
+                } @else {
+                  Sin límite
+                }
+              </td>
+              <td>{{ c.uses }}{{ c.maxUses !== null ? ' / ' + c.maxUses : '' }}</td>
+              <td>
+                <span [class]="c.active ? 'stock-ok' : 'stock-zero'">{{ c.active ? 'Sí' : 'No' }}</span>
+              </td>
+              <td>
+                <div class="actions">
+                  <a [routerLink]="[c.id, 'edit']" class="btn btn-secondary btn-sm">
+                    <lucide-icon name="edit" [size]="14"></lucide-icon>
+                  </a>
+                  <button class="btn btn-danger btn-sm" (click)="onDelete(c.id)">
+                    <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,73 @@
+<div class="fade-in">
+  <div class="page-header">
+    <div class="header-back">
+      <a [routerLink]="discountsUrl" class="back-link">
+        <lucide-icon name="chevron-left" [size]="18"></lucide-icon>
+      </a>
+      <h1>Tramos de puntos</h1>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  }
+
+  @if (store.loading()) {
+    <div class="spinner"></div>
+  } @else if (store.error()) {
+    <div class="alert-error">{{ store.error() }}</div>
+  } @else {
+    <div class="card table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Puntos</th>
+            <th>Descuento (€)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of store.items(); track r.id) {
+            <tr>
+              @if (editingId() === r.id) {
+                <td><input type="number" class="form-control rule-input" [value]="editPoints()" (input)="editPoints.set(toNumber($event))" min="1" step="1" /></td>
+                <td><input type="number" class="form-control rule-input" [value]="editAmount()" (input)="editAmount.set(toNumber($event))" min="0.01" step="0.01" /></td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-primary btn-sm" (click)="saveEdit(r.id)" [disabled]="saving()">Guardar</button>
+                    <button class="btn btn-secondary btn-sm" (click)="cancelEdit()">Cancelar</button>
+                  </div>
+                </td>
+              } @else {
+                <td>{{ r.points }} pts</td>
+                <td>{{ r.amount.toFixed(2) }} €</td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-secondary btn-sm" (click)="startEdit(r)">
+                      <lucide-icon name="edit" [size]="14"></lucide-icon>
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="onDelete(r.id)">
+                      <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr><td colspan="3">No hay tramos definidos todavía.</td></tr>
+          }
+          <tr class="new-row">
+            <td><input type="number" class="form-control rule-input" [value]="newPoints()" (input)="newPoints.set(toNumber($event))" min="1" step="1" placeholder="Puntos" /></td>
+            <td><input type="number" class="form-control rule-input" [value]="newAmount()" (input)="newAmount.set(toNumber($event))" min="0.01" step="0.01" placeholder="Euros" /></td>
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="add()" [disabled]="saving()">
+                <lucide-icon name="plus" [size]="14"></lucide-icon>
+                Añadir
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
