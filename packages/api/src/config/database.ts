@@ -177,7 +177,26 @@ export class Database {
                 FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_mesas_restaurant_numero ON mesas(restaurant_id, numero)
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_mesas_restaurant_numero ON mesas(restaurant_id, numero);
+
+            CREATE TABLE IF NOT EXISTS discount_codes (
+                id TEXT PRIMARY KEY,
+                restaurant_id TEXT NOT NULL,
+                code TEXT NOT NULL COLLATE NOCASE,
+                type TEXT NOT NULL,
+                value REAL NOT NULL,
+                min_order REAL,
+                valid_from TEXT,
+                valid_until TEXT,
+                max_uses INTEGER,
+                uses INTEGER NOT NULL DEFAULT 0,
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_discount_codes_restaurant_code ON discount_codes(restaurant_id, code)
         `.split(';')
 
         for (const q of queries) {
