@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { DecimalPipe } from '@angular/common'
 import { CartStore } from '../../core/store/cart.store'
+import { TableSessionStore } from '../../core/store/table-session.store'
 import { OrderService } from '../../core/services/order.service'
 
 @Component({
@@ -172,6 +173,7 @@ export class CartComponent {
   readonly cartStore = inject(CartStore)
   private readonly orderService = inject(OrderService)
   private readonly router = inject(Router)
+  private readonly tableSession = inject(TableSessionStore)
 
   readonly loading = signal(false)
   readonly error = signal<string | null>(null)
@@ -207,9 +209,10 @@ export class CartComponent {
       notes: item.notes || null
     }))
 
-    this.orderService.createOrder(restaurantId, items).subscribe({
+    this.orderService.createOrder(restaurantId, this.tableSession.table()?.id ?? null, items).subscribe({
       next: (order) => {
         this.cartStore.clear()
+        this.tableSession.clear()
         this.router.navigate(['/orders', order.id])
       },
       error: (err) => {
