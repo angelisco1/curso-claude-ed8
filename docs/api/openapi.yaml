@@ -1262,6 +1262,102 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/DiscountNotFound' }
+  /api/v1/restaurants/{restaurantId}/points-rules:
+    parameters:
+      - $ref: '#/components/parameters/RestaurantId'
+    get:
+      tags: [Discounts]
+      summary: Listar los tramos de equivalencia puntos a euros
+      description: 'Roles: `admin`, `manager` (del restaurante; `admin` accede a cualquiera).'
+      operationId: listPointsRules
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Tramos ordenados por `points` ascendente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PointsRule' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
+    post:
+      tags: [Discounts]
+      summary: Crear un tramo de puntos
+      description: 'Roles: `admin`, `manager`. `points` es único por restaurante (409 si se repite).'
+      operationId: createPointsRule
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PointsRuleRequest' }
+            example: { points: 100, amount: 10 }
+      responses:
+        '201':
+          description: Tramo creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PointsRule' }
+        '400': { $ref: '#/components/responses/DiscountBadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
+        '409': { $ref: '#/components/responses/DiscountConflict' }
+  /api/v1/restaurants/{restaurantId}/points-rules/{id}:
+    parameters:
+      - $ref: '#/components/parameters/RestaurantId'
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Discounts]
+      summary: Obtener un tramo de puntos
+      description: 'Roles: `admin`, `manager` (del restaurante).'
+      operationId: getPointsRule
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Tramo encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PointsRule' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
+    put:
+      tags: [Discounts]
+      summary: Actualizar un tramo de puntos
+      description: 'Roles: `admin`, `manager` (del restaurante). El duplicado de `points` excluye el propio tramo.'
+      operationId: updatePointsRule
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PointsRuleRequest' }
+            example: { points: 100, amount: 12.5 }
+      responses:
+        '200':
+          description: Tramo actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PointsRule' }
+        '400': { $ref: '#/components/responses/DiscountBadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
+        '409': { $ref: '#/components/responses/DiscountConflict' }
+    delete:
+      tags: [Discounts]
+      summary: Eliminar un tramo de puntos
+      description: 'Roles: `admin`, `manager` (del restaurante).'
+      operationId: deletePointsRule
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Tramo eliminado }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/DiscountNotFound' }
 components:
   securitySchemes:
     bearerAuth:
@@ -1814,3 +1910,17 @@ components:
             id: { type: string, format: uuid }
             restaurantId: { type: string }
             uses: { type: integer, minimum: 0, readOnly: true, description: Veces que se ha canjeado }
+    PointsRuleRequest:
+      type: object
+      required: [points, amount]
+      properties:
+        points: { type: integer, minimum: 1, description: Puntos que cuesta el tramo, example: 100 }
+        amount: { type: number, exclusiveMinimum: true, minimum: 0, description: 'Descuento en euros (2 decimales)', example: 10 }
+    PointsRule:
+      allOf:
+        - $ref: '#/components/schemas/PointsRuleRequest'
+        - type: object
+          required: [id, restaurantId]
+          properties:
+            id: { type: string, format: uuid }
+            restaurantId: { type: string }
