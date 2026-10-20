@@ -14,6 +14,7 @@ import {
     BillDiscountConflictError,
     BillDiscountRejectedError,
     PointsRuleNotFoundError,
+    BillAlreadyRequestedError,
     InvalidDiscountCodeError
 } from '@errors/DomainErrors.js'
 
@@ -45,6 +46,17 @@ export class BillService {
         if (existing) return toBillSummary(existing)
 
         return toBillSummary(await this.buildDraft(order, clientId, options))
+    }
+
+    async confirm(orderId: string, clientId: string, options: BillOptions): Promise<BillSummary> {
+        const order = await this.getOwnOrder(orderId, clientId)
+        if (await this.billRepository.findByOrderId(orderId)) {
+            throw new BillAlreadyRequestedError()
+        }
+
+        const bill: BillRecord = { ...(await this.buildDraft(order, clientId, options)), createdAt: new Date().toISOString() }
+        await this.billRepository.confirm(bill, { restaurantId: order.restaurantId, clientId })
+        return toBillSummary(bill)
     }
 
     protected async getOwnOrder(orderId: string, clientId: string): Promise<Order> {

@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename)
 export class Database {
     private db: sqlite3.Database | null = null
     private dbPath: string
+    private transactionQueue: Promise<unknown> = Promise.resolve()
 
     constructor() {
         const env = process.env.NODE_ENV || 'development'
@@ -70,6 +71,28 @@ export class Database {
                 resolve(row as T)
             })
         })
+    }
+
+    /**
+     * Runs `work` inside BEGIN IMMEDIATE / COMMIT, rolling back if it throws.
+     * There is a single connection, so transactions are serialized to keep
+     * statements of different requests from interleaving inside one of them.
+     */
+    public transaction<T>(work: () => Promise<T>): Promise<T> {
+        const execute = async (): Promise<T> => {
+            await this.run('BEGIN IMMEDIATE')
+            try {
+                const result = await work()
+                await this.run('COMMIT')
+                return result
+            } catch (error) {
+                await this.run('ROLLBACK')
+                throw error
+            }
+        }
+        const result = this.transactionQueue.then(execute, execute)
+        this.transactionQueue = result.catch(() => undefined)
+        return result
     }
 
     public async close(): Promise<void> {

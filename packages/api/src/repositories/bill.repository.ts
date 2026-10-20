@@ -1,6 +1,6 @@
 import { Database } from '@config/database.js'
 import type { BillRecord } from '@models/bill.model.js'
-import { BillAlreadyRequestedError } from '@errors/DomainErrors.js'
+import { BillAlreadyRequestedError, BillDiscountRejectedError } from '@errors/DomainErrors.js'
 
 interface BillRow {
     orderId: string
@@ -16,6 +16,12 @@ interface BillRow {
 export interface BillRepository {
     findByOrderId(orderId: string): Promise<BillRecord | null>
     save(bill: BillRecord): Promise<void>
+    confirm(bill: BillRecord, context: BillContext): Promise<void>
+}
+
+export interface BillContext {
+    restaurantId: string
+    clientId: string
 }
 
 const SELECT_COLUMNS = `order_id as orderId, subtotal, code_id as codeId, code, discount,
@@ -39,6 +45,31 @@ export class SqliteBillRepository implements BillRepository {
             if (isUniqueViolation(error)) throw new BillAlreadyRequestedError()
             throw error
         }
+    }
+
+    /**
+     * Atomically stores the bill, consumes one use of the code and subtracts the
+     * points. The guarded UPDATEs make exhausted codes and insufficient balances
+     * fail even if they changed after the service validated them.
+     */
+    async confirm(bill: BillRecord, context: BillContext): Promise<void> {
+        await this.db.transaction(async () => {
+            await this.save(bill)
+            if (bill.codeId) {
+                const result = await this.db.run(
+                    'UPDATE discount_codes SET uses = uses + 1 WHERE id = ? AND (max_uses IS NULL OR uses < max_uses)',
+                    [bill.codeId]
+                )
+                if (result.changes === 0) throw new BillDiscountRejectedError('exhausted')
+            }
+            if (bill.pointsUsed > 0) {
+                const result = await this.db.run(
+                    'UPDATE client_points SET balance = balance - ? WHERE client_id = ? AND restaurant_id = ? AND balance >= ?',
+                    [bill.pointsUsed, context.clientId, context.restaurantId, bill.pointsUsed]
+                )
+                if (result.changes === 0) throw new BillDiscountRejectedError('insufficient_points')
+            }
+        })
     }
 
     protected async insert(bill: BillRecord): Promise<void> {

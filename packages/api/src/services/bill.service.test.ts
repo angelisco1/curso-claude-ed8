@@ -11,7 +11,8 @@ import {
     BillCodeInvalidError,
     BillDiscountConflictError,
     BillDiscountRejectedError,
-    PointsRuleNotFoundError
+    PointsRuleNotFoundError,
+    BillAlreadyRequestedError
 } from '@errors/DomainErrors.js'
 
 const code = (overrides: Partial<DiscountCode> = {}): DiscountCode => ({
@@ -32,7 +33,7 @@ describe('BillService', () => {
         codes = new MockDiscountCodeRepository()
         rules = new MockPointsRuleRepository()
         points = new MockClientPointsRepository()
-        bills = new MockBillRepository()
+        bills = new MockBillRepository(codes, points)
         service = new BillService(orders, codes, rules, points, bills)
 
         // 10.00 + 10.00 + 5.50 = 25.50
@@ -142,6 +143,53 @@ describe('BillService', () => {
             expect(await service.preview('o1', 'c1', {})).toEqual({
                 subtotal: 25.5, discount: 2.55, pointsUsed: 0, total: 22.95, code: 'OLD'
             })
+        })
+    })
+
+    describe('confirm', () => {
+        it('should store the bill and return the same summary as the preview', async () => {
+            await codes.save(code())
+            const preview = await service.preview('o1', 'c1', { code: 'VERANO10' })
+            const confirmed = await service.confirm('o1', 'c1', { code: 'VERANO10' })
+
+            expect(confirmed).toEqual(preview)
+            expect(await bills.findByOrderId('o1')).toMatchObject({ subtotal: 2550, discount: 255, total: 2295, code: 'VERANO10', codeId: 'code-1' })
+        })
+
+        it('should increment the uses of the code', async () => {
+            await codes.save(code())
+            await service.confirm('o1', 'c1', { code: 'VERANO10' })
+            expect((await codes.findById('code-1'))?.uses).toBe(1)
+        })
+
+        it('should subtract the points of the rule from the balance', async () => {
+            await points.setBalance('c1', 'r1', 250)
+            const summary = await service.confirm('o1', 'c1', { pointsRuleId: 'p1' })
+
+            expect(summary).toMatchObject({ discount: 10, pointsUsed: 100, total: 15.5 })
+            expect(await points.getBalance('c1', 'r1')).toBe(150)
+        })
+
+        it('should confirm without discount', async () => {
+            expect(await service.confirm('o1', 'c1', {})).toEqual({ subtotal: 25.5, discount: 0, pointsUsed: 0, total: 25.5 })
+        })
+
+        it('should throw BillAlreadyRequestedError the second time and not charge twice', async () => {
+            await codes.save(code())
+            await service.confirm('o1', 'c1', { code: 'VERANO10' })
+            await expect(service.confirm('o1', 'c1', { code: 'VERANO10' })).rejects.toThrow(BillAlreadyRequestedError)
+            expect((await codes.findById('code-1'))?.uses).toBe(1)
+        })
+
+        it('should not store anything when the discount is rejected', async () => {
+            await codes.save(code({ active: false }))
+            await expect(service.confirm('o1', 'c1', { code: 'VERANO10' })).rejects.toThrow(BillDiscountRejectedError)
+            await expect(service.confirm('o1', 'c1', { code: 'X', pointsRuleId: 'p1' })).rejects.toThrow(BillDiscountConflictError)
+            expect(await bills.findByOrderId('o1')).toBeNull()
+        })
+
+        it('should throw OrderNotFoundError for an order of another client', async () => {
+            await expect(service.confirm('o1', 'someone-else', {})).rejects.toThrow(OrderNotFoundError)
         })
     })
 })
