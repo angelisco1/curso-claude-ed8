@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { AuthStore } from '@resttek/web-shared';
 import { OrderStore } from '../../store/order.store';
+import { TableStore } from '../../../tables/store/table.store';
 
 @Component({
   selector: 'app-salon',
@@ -11,11 +12,13 @@ import { OrderStore } from '../../store/order.store';
 export class SalonComponent implements OnInit, OnDestroy {
   private readonly authStore = inject(AuthStore);
   readonly orderStore = inject(OrderStore);
+  private readonly tableStore = inject(TableStore);
 
   ngOnInit(): void {
     const restaurantId = this.authStore.user()?.restaurantId;
     if (restaurantId) {
       this.orderStore.startPolling(restaurantId);
+      this.tableStore.load(restaurantId);
     }
   }
 
@@ -32,6 +35,10 @@ export class SalonComponent implements OnInit, OnDestroy {
 
   deliver(orderId: string, itemId: string): void {
     this.orderStore.updateItemStatus(orderId, itemId, 'entregado');
+  }
+
+  tableLabel(tableId: string): string {
+    return this.tableStore.tablesById().get(tableId)?.numero?.toString() ?? '';
   }
 
   getStatusClass(status: string): string {

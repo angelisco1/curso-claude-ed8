@@ -163,7 +163,21 @@ export class Database {
                 status TEXT NOT NULL,
                 FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
                 FOREIGN KEY(dish_id) REFERENCES dishes(id)
-            )
+            );
+
+            CREATE TABLE IF NOT EXISTS mesas (
+                id TEXT PRIMARY KEY,
+                restaurant_id TEXT NOT NULL,
+                numero INTEGER NOT NULL,
+                descripcion TEXT NOT NULL DEFAULT '',
+                capacidad INTEGER NOT NULL,
+                estado TEXT NOT NULL DEFAULT 'libre',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_mesas_restaurant_numero ON mesas(restaurant_id, numero)
         `.split(';')
 
         for (const q of queries) {

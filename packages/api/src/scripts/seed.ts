@@ -158,11 +158,30 @@ const seed = async () => {
 
         console.log('Restaurant 2 dishes created: 1 dish + 1 drink')
 
+        const tableSeeds = [
+            { numero: 1, descripcion: 'Terraza', capacidad: 2, estado: 'libre' },
+            { numero: 2, descripcion: 'Terraza', capacidad: 4, estado: 'libre' },
+            { numero: 3, descripcion: 'Salón', capacidad: 4, estado: 'reservada' },
+            { numero: 4, descripcion: 'Salón', capacidad: 6, estado: 'libre' },
+            { numero: 5, descripcion: 'Barra', capacidad: 2, estado: 'ocupada' },
+            { numero: 6, descripcion: 'Salón privado', capacidad: 10, estado: 'libre' }
+        ]
+        for (const restaurantId of ['rest-1', 'rest-2']) {
+            for (const t of tableSeeds) {
+                const now = new Date().toISOString()
+                await dbConfig.run(`
+                    INSERT OR IGNORE INTO mesas (id, restaurant_id, numero, descripcion, capacidad, estado, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `, [`mesa-${restaurantId}-${t.numero}`, restaurantId, t.numero, t.descripcion, t.capacidad, t.estado, now, now])
+            }
+        }
+        console.log('Tables created: 6 per restaurant')
+
         const order1Id = randomUUID()
         await dbConfig.run(`
             INSERT OR IGNORE INTO orders (id, restaurant_id, table_id, client_id, created_at)
             VALUES (?, ?, ?, ?, ?)
-        `, [order1Id, 'rest-1', '5', null, new Date().toISOString()])
+        `, [order1Id, 'rest-1', 'mesa-rest-1-5', null, new Date().toISOString()])
 
         for (let i = 0; i < 2; i++) {
             await dbConfig.run(`

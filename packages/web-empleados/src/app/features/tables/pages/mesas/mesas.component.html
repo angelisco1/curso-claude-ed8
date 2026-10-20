@@ -1,0 +1,65 @@
+<div class="page-header">
+  <h1>Mesas</h1>
+</div>
+
+@if (tableStore.loading() && tableStore.tables().length === 0) {
+  <div class="spinner"></div>
+}
+
+@if (tableStore.error()) {
+  <div class="alert-error">{{ tableStore.error() }}</div>
+}
+
+@if (!tableStore.loading() || tableStore.tables().length > 0) {
+  @if (tableStore.tables().length === 0) {
+    <div class="empty-state">
+      <p>No hay mesas configuradas</p>
+    </div>
+  } @else {
+    <div class="tables-grid">
+      @for (table of tableStore.tables(); track table.id) {
+        <div class="table-card" [class]="'table-card estado-' + table.estado">
+          <div class="table-header">
+            <span class="table-number">Mesa {{ table.numero }}</span>
+            <span class="status-badge" [class]="'status-badge estado-' + table.estado">{{ table.estado }}</span>
+          </div>
+          <div class="table-meta">
+            <span>{{ table.capacidad }} personas</span>
+            @if (table.descripcion) {
+              <span class="table-desc">{{ table.descripcion }}</span>
+            }
+          </div>
+
+          @if (table.estado === 'ocupada') {
+            <div class="table-orders">
+              @if (ordersOf(table).length === 0) {
+                <p class="muted">Sin pedidos pendientes</p>
+              } @else {
+                @for (order of ordersOf(table); track order.id) {
+                  @for (item of order.items; track item.id) {
+                    <div class="order-line">
+                      <span><strong>{{ item.quantity }}x</strong> {{ item.dishName || 'Producto' }}</span>
+                      <span [class]="'badge badge-' + item.status">{{ item.status }}</span>
+                    </div>
+                  }
+                }
+              }
+            </div>
+          }
+
+          @if (canEdit()) {
+            <div class="table-actions">
+              @for (s of statuses; track s) {
+                @if (s !== table.estado) {
+                  <button class="btn btn-sm btn-secondary" (click)="changeStatus(table, s)">
+                    Marcar {{ s }}
+                  </button>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+}
