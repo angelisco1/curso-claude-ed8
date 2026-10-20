@@ -177,6 +177,47 @@ const seed = async () => {
         }
         console.log('Tables created: 6 per restaurant')
 
+        const discountSeeds = [
+            { key: 'bienvenida10', code: 'BIENVENIDA10', type: 'percent', value: 10, minOrder: null, validUntil: null, maxUses: null, active: 1 },
+            { key: 'menos5', code: 'MENOS5', type: 'fixed', value: 5, minOrder: 20, validUntil: null, maxUses: 50, active: 1 },
+            { key: 'caducado', code: 'CADUCADO', type: 'percent', value: 15, minOrder: null, validUntil: '2020-12-31T23:59:59.000Z', maxUses: null, active: 1 },
+            { key: 'apagado', code: 'APAGADO', type: 'fixed', value: 3, minOrder: null, validUntil: null, maxUses: null, active: 0 },
+        ]
+        const pointsRuleSeeds = [
+            { points: 10, amount: 1 },
+            { points: 50, amount: 5 },
+            { points: 100, amount: 10 },
+        ]
+        for (const restaurantId of ['rest-1', 'rest-2']) {
+            const now = new Date().toISOString()
+            for (const d of discountSeeds) {
+                await dbConfig.run(`
+                    INSERT OR IGNORE INTO discount_codes (id, restaurant_id, code, type, value, min_order, valid_until, max_uses, uses, active, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                `, [`code-${restaurantId}-${d.key}`, restaurantId, d.code, d.type, d.value, d.minOrder, d.validUntil, d.maxUses, d.active, now, now])
+            }
+            for (const r of pointsRuleSeeds) {
+                await dbConfig.run(`
+                    INSERT OR IGNORE INTO points_rules (id, restaurant_id, points, amount, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                `, [`rule-${restaurantId}-${r.points}`, restaurantId, r.points, r.amount, now, now])
+            }
+        }
+        console.log('Discount codes (4) and points rules (3) created per restaurant')
+
+        for (const [email, balance] of [['cliente1@resttek.com', 250], ['cliente2@resttek.com', 40]] as const) {
+            const client = await employeeRepo.findByEmail(email)
+            if (client) {
+                for (const restaurantId of ['rest-1', 'rest-2']) {
+                    await dbConfig.run(
+                        'INSERT OR IGNORE INTO client_points (client_id, restaurant_id, balance) VALUES (?, ?, ?)',
+                        [client.id, restaurantId, balance]
+                    )
+                }
+            }
+        }
+        console.log('Client points balances created')
+
         const order1Id = randomUUID()
         await dbConfig.run(`
             INSERT OR IGNORE INTO orders (id, restaurant_id, table_id, client_id, created_at)
