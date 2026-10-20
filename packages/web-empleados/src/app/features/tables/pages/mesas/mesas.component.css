@@ -1,0 +1,113 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.table-card.estado-libre { border-left-color: var(--green-light); }
+.table-card.estado-ocupada { border-left-color: var(--orange); }
+.table-card.estado-reservada { border-left-color: var(--yellow); }
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-number {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.estado-libre { background: var(--green-glow); color: var(--green-light); }
+.status-badge.estado-ocupada { background: var(--orange-glow); color: var(--orange); }
+.status-badge.estado-reservada { background: var(--yellow-glow); color: var(--yellow); }
+
+.table-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.table-desc {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.table-orders {
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.muted {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.badge-pendiente { background: var(--yellow-glow); color: var(--yellow); }
+.badge-preparando { background: var(--orange-glow); color: var(--orange); }
+.badge-listo { background: var(--green-glow); color: var(--green-light); }
+.badge-entregado { background: rgba(139, 146, 168, 0.1); color: var(--text-muted); }
