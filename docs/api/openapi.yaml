@@ -1569,7 +1569,7 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/DomainError' }
-          example: { error: BillDiscountConflictError, message: Use either a discount code or a points rule, not both }
+          example: { error: BillDiscountConflictError, message: 'Use either a discount code or a points rule, not both' }
     BillNotFound:
       description: |
         Pedido no existente o de otro cliente (`OrderNotFoundError`), código inexistente en el restaurante
@@ -2118,7 +2118,7 @@ components:
         discount: { type: number, description: 'Descuento aplicado, en euros (nunca mayor que el subtotal)' }
         pointsUsed: { type: integer, description: Puntos canjeados (0 si no hay canje) }
         total: { type: number, description: 'subtotal - discount, mínimo 0' }
-        code: { type: string, description: Código aplicado, si lo hay }
+        code: { type: string, description: 'Código aplicado, si lo hay' }
     BillError:
       allOf:
         - $ref: '#/components/schemas/DomainError'

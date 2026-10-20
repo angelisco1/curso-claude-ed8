@@ -54,7 +54,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 ### Fase 0 — Contrato (previa, bloquea a las demás)
 
 1. [x] **Documentar el contrato de códigos y tramos** — `docs/api/openapi.yaml`: paths y schemas de `discount-codes` y `points-rules` con `security`, respuesta 401, y `example` en cada requestBody.
-2. [ ] **Documentar saldo y cuenta** — `docs/api/openapi.yaml`: `PUT .../points`, `GET .../points/me`, `GET/POST /orders/{id}/bill`, con los errores y `reason` de la tabla.
+2. [x] **Documentar saldo y cuenta** — `docs/api/openapi.yaml`: `PUT .../points`, `GET .../points/me`, `GET/POST /orders/{id}/bill`, con los errores y `reason` de la tabla.
 
 > El test `openapi.test.ts` fallará hasta que se monten las rutas en la Fase A; es esperado en esta fase. Si se prefiere, las tareas 1-2 pueden hacerse junto a A5/A12 y dejar aquí solo el acuerdo del contrato.
 
