@@ -72,7 +72,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 10. [x] **Tabla de cuentas** — migración y repositorio de `order_bills(order_id UNIQUE, subtotal, code_id, discount, points_used, total, created_at)` con mock.
 11. [x] **Servicio de cuenta: previsualizar** — `src/services/bill.service.ts` + tests: calcula subtotal con `dishPrice` de las líneas, valida código (activo, vigencia, usos, mínimo) o tramo (saldo), rechaza código+puntos a la vez.
 12. [x] **Servicio de cuenta: confirmar** — `bill.service.ts` + tests: transacción que guarda la cuenta, incrementa `uses` o resta puntos; 409 si ya existe.
-13. [ ] **Endpoints de cuenta** — `order.routes.ts`, controller: `GET/POST /orders/:id/bill`, comprobando que el pedido pertenece al cliente del JWT.
+13. [x] **Endpoints de cuenta** — `order.routes.ts`, controller: `GET/POST /orders/:id/bill`, comprobando que el pedido pertenece al cliente del JWT.
 14. [ ] **Seed y cierre** — `scripts/seed.ts`: códigos, tramos y saldo de ejemplo (idempotente). Actualizar el contador de rutas de `openapi.test.ts` y que `npm test` pase.
 
 ### Fase B — web-admin (`packages/web-admin`)

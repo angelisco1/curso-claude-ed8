@@ -1422,6 +1422,85 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/DiscountNotFound' }
+  /api/v1/orders/{id}/bill:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Discounts]
+      summary: Previsualizar la cuenta de un pedido
+      description: |
+        Rol: `cliente` dueño del pedido (404 si el pedido no existe o es de otro cliente). Calcula
+        subtotal, descuento y total **sin guardar nada**. Se puede indicar un `code` **o** un
+        `pointsRuleId`, nunca ambos (400). Si el pedido ya tiene cuenta confirmada devuelve la cuenta guardada.
+
+        Importes en euros (2 decimales). El descuento nunca supera el subtotal (total mínimo 0).
+      operationId: previewBill
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: code
+          in: query
+          schema: { type: string }
+          description: Código de descuento (sin distinguir mayúsculas)
+        - name: pointsRuleId
+          in: query
+          schema: { type: string }
+          description: Tramo de puntos a canjear (id de `GET .../points/me`)
+      responses:
+        '200':
+          description: Cuenta calculada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bill' }
+              example: { subtotal: 25.5, discount: 2.55, pointsUsed: 0, total: 22.95, code: VERANO10 }
+        '400': { $ref: '#/components/responses/BillBadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/BillNotFound' }
+        '422': { $ref: '#/components/responses/BillUnprocessable' }
+    post:
+      tags: [Discounts]
+      summary: Pedir la cuenta de un pedido
+      description: |
+        Rol: `cliente` dueño del pedido. Confirma la cuenta y, en una única transacción, guarda la
+        cuenta, incrementa los usos del código o resta los puntos del saldo. Solo hay una cuenta por
+        pedido: una segunda petición devuelve 409. Devuelve lo mismo que el `GET`.
+        Body: `{ code }` o `{ pointsRuleId }` (o vacío para pedir la cuenta sin descuento), nunca ambos.
+      operationId: requestBill
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code: { type: string }
+                pointsRuleId: { type: string }
+            examples:
+              codigo:
+                summary: Con código de descuento
+                value: { code: VERANO10 }
+              puntos:
+                summary: Canjeando un tramo de puntos
+                value: { pointsRuleId: 3f2b8c1e-0000-4000-8000-000000000002 }
+      responses:
+        '200':
+          description: Cuenta confirmada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bill' }
+              example: { subtotal: 25.5, discount: 10, pointsUsed: 100, total: 15.5 }
+        '400': { $ref: '#/components/responses/BillBadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/BillNotFound' }
+        '409':
+          description: Ya se pidió la cuenta de este pedido (`BillAlreadyRequestedError`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DomainError' }
+              example: { error: BillAlreadyRequestedError, message: The bill for this order has already been requested }
+        '422': { $ref: '#/components/responses/BillUnprocessable' }
 components:
   securitySchemes:
     bearerAuth:
@@ -1485,6 +1564,28 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/DomainError' }
           example: { error: DuplicatedDiscountCodeError, message: Discount code already exists in this restaurant }
+    BillBadRequest:
+      description: Código y tramo de puntos a la vez (`BillDiscountConflictError`) o parámetros inválidos
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/DomainError' }
+          example: { error: BillDiscountConflictError, message: Use either a discount code or a points rule, not both }
+    BillNotFound:
+      description: |
+        Pedido no existente o de otro cliente (`OrderNotFoundError`), código inexistente en el restaurante
+        del pedido (`BillCodeInvalidError`, con `reason: invalid`) o tramo inexistente (`PointsRuleNotFoundError`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/BillError' }
+          example: { error: BillCodeInvalidError, message: Discount code does not exist, reason: invalid }
+    BillUnprocessable:
+      description: |
+        Descuento no aplicable (`BillDiscountRejectedError`). `reason`: `expired` (fuera de vigencia),
+        `exhausted` (sin usos), `inactive`, `min_order` (subtotal bajo el mínimo) o `insufficient_points` (saldo insuficiente)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/BillError' }
+          example: { error: BillDiscountRejectedError, message: Discount code has expired, reason: expired }
     BadRequest:
       description: Datos inválidos o regla de dominio incumplida
       content:
@@ -2009,3 +2110,20 @@ components:
               id: { type: string, format: uuid }
               points: { type: integer }
               amount: { type: number }
+    Bill:
+      type: object
+      required: [subtotal, discount, pointsUsed, total]
+      properties:
+        subtotal: { type: number, description: 'Suma de los platos del pedido, en euros' }
+        discount: { type: number, description: 'Descuento aplicado, en euros (nunca mayor que el subtotal)' }
+        pointsUsed: { type: integer, description: Puntos canjeados (0 si no hay canje) }
+        total: { type: number, description: 'subtotal - discount, mínimo 0' }
+        code: { type: string, description: Código aplicado, si lo hay }
+    BillError:
+      allOf:
+        - $ref: '#/components/schemas/DomainError'
+        - type: object
+          properties:
+            reason:
+              type: string
+              enum: [invalid, expired, exhausted, inactive, min_order, insufficient_points]
