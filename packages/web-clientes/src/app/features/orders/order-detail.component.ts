@@ -3,12 +3,15 @@ import { ActivatedRoute, RouterLink } from '@angular/router'
 import { DecimalPipe, DatePipe, NgClass } from '@angular/common'
 import { LucideAngularModule } from 'lucide-angular'
 import { OrderService } from '../../core/services/order.service'
-import { Order, OrderItem } from '../../core/models/order.model'
+import { Order } from '../../core/models/order.model'
+import { BillStore } from '../../core/store/bill.store'
+import { BillRequestComponent } from './bill-request.component'
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, DatePipe, NgClass, LucideAngularModule],
+  imports: [RouterLink, DecimalPipe, DatePipe, NgClass, LucideAngularModule, BillRequestComponent],
+  providers: [BillStore],
   template: `
     <div class="container">
       @if (loading()) {
@@ -61,8 +64,12 @@ import { Order, OrderItem } from '../../core/models/order.model'
 
           <div class="ticket-total">
             <span>Total</span>
-            <strong>{{ getTotal() | number:'1.2-2' }} €</strong>
+            <strong>{{ ticketTotal() | number:'1.2-2' }} €</strong>
           </div>
+
+          <div class="ticket-divider"></div>
+
+          <app-bill-request [orderId]="order()!.id" [restaurantId]="order()!.restaurantId" />
         </div>
       }
     </div>
@@ -176,6 +183,7 @@ import { Order, OrderItem } from '../../core/models/order.model'
 export class OrderDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute)
   private readonly orderService = inject(OrderService)
+  private readonly billStore = inject(BillStore)
   private pollInterval: ReturnType<typeof setInterval> | null = null
 
   readonly order = signal<Order | null>(null)
@@ -207,6 +215,12 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  /** Server total of the requested bill; local sum while there is no bill. */
+  readonly ticketTotal = computed(() => {
+    const bill = this.billStore.summary()
+    return this.billStore.requested() && bill ? bill.total : this.getTotal()
+  })
 
   getTotal(): number {
     const o = this.order()

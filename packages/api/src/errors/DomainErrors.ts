@@ -204,3 +204,88 @@ export class TableOccupiedError extends AppError {
     super('Occupied tables cannot be deleted')
   }
 }
+
+export class DiscountCodeNotFoundError extends AppError {
+  constructor() {
+    super('Discount code not found')
+  }
+}
+
+export class DuplicatedDiscountCodeError extends AppError {
+  constructor() {
+    super('Discount code already exists in this restaurant')
+  }
+}
+
+export class InvalidDiscountCodeError extends AppError {
+  constructor(message?: string) {
+    super(message ?? 'Invalid discount code')
+  }
+}
+
+export class PointsRuleNotFoundError extends AppError {
+  constructor() {
+    super('Points rule not found')
+  }
+}
+
+export class DuplicatedPointsRuleError extends AppError {
+  constructor() {
+    super('A points rule with these points already exists in this restaurant')
+  }
+}
+
+export class InvalidPointsRuleError extends AppError {
+  constructor(message?: string) {
+    super(message ?? 'Invalid points rule')
+  }
+}
+
+export class InvalidPointsBalanceError extends AppError {
+  constructor() {
+    super('Points balance must be a non-negative integer')
+  }
+}
+
+export class BillAlreadyRequestedError extends AppError {
+  constructor() {
+    super('The bill for this order has already been requested')
+  }
+}
+
+export class BillDiscountConflictError extends AppError {
+  constructor() {
+    super('Use either a discount code or a points rule, not both')
+  }
+}
+
+export type BillRejectionReason =
+  | 'invalid'
+  | 'expired'
+  | 'exhausted'
+  | 'inactive'
+  | 'min_order'
+  | 'insufficient_points'
+
+export class BillCodeInvalidError extends AppError {
+  readonly reason: BillRejectionReason = 'invalid'
+
+  constructor() {
+    super('Discount code does not exist')
+  }
+}
+
+const REJECTION_MESSAGES: Record<BillRejectionReason, string> = {
+  invalid: 'Discount is not valid',
+  expired: 'Discount code has expired',
+  exhausted: 'Discount code has no uses left',
+  inactive: 'Discount code is not active',
+  min_order: 'Order total is below the minimum required by the code',
+  insufficient_points: 'Not enough points for this rule'
+}
+
+export class BillDiscountRejectedError extends AppError {
+  constructor(public readonly reason: BillRejectionReason) {
+    super(REJECTION_MESSAGES[reason])
+  }
+}

@@ -41,6 +41,10 @@ export const routes: Routes = [
             loadChildren: () => import('./features/tables/tables.routes').then(m => m.TABLE_ROUTES)
           },
           {
+            path: 'discounts',
+            loadChildren: () => import('./features/discounts/discounts.routes').then(m => m.DISCOUNT_ROUTES)
+          },
+          {
             path: 'employees',
             loadChildren: () => import('./features/employees/employees.routes').then(m => m.EMPLOYEE_ROUTES)
           }

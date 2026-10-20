@@ -79,7 +79,7 @@ describe('OpenAPI contract', () => {
         const routes = collect_mounted_routes()
 
         it('finds the mounted routes of the app', () => {
-            expect(routes).toHaveLength(38)
+            expect(routes).toHaveLength(52)
         })
 
         it.each(routes.map(route => [`${route.method.toUpperCase()} ${route.path}`, route] as const))(

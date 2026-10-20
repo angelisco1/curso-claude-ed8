@@ -6,13 +6,24 @@ const NOT_FOUND_ERRORS = [
     'RestaurantNotFoundError',
     'IngredientNotFoundError',
     'DishNotFoundError',
-    'TableNotFoundError'
+    'TableNotFoundError',
+    'DiscountCodeNotFoundError',
+    'PointsRuleNotFoundError',
+    'BillCodeInvalidError',
+    'OrderNotFoundError'
 ]
 
 const CONFLICT_ERRORS = [
     'DuplicatedTableNumberError',
     'TableNotAvailableError',
-    'TableOccupiedError'
+    'TableOccupiedError',
+    'DuplicatedDiscountCodeError',
+    'DuplicatedPointsRuleError',
+    'BillAlreadyRequestedError'
+]
+
+const UNPROCESSABLE_ERRORS = [
+    'BillDiscountRejectedError'
 ]
 
 const UNAUTHORIZED_ERRORS = [
@@ -29,11 +40,15 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
             statusCode = 401
         } else if (CONFLICT_ERRORS.includes(err.name)) {
             statusCode = 409
+        } else if (UNPROCESSABLE_ERRORS.includes(err.name)) {
+            statusCode = 422
         }
 
+        const reason = (err as { reason?: string }).reason
         res.status(statusCode).json({
             error: err.name,
-            message: err.message
+            message: err.message,
+            ...(reason ? { reason } : {})
         })
         return
     }

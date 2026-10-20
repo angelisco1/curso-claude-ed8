@@ -11,6 +11,9 @@ import publicDishRoutes from '@routes/dish.public.routes.js'
 import tableRoutes from '@routes/table.routes.js'
 import publicTableRoutes from '@routes/table.public.routes.js'
 import orderRoutes from '@routes/order.routes.js'
+import discountCodeRoutes from '@routes/discount-code.routes.js'
+import pointsRuleRoutes from '@routes/points-rule.routes.js'
+import pointsRoutes from '@routes/points.routes.js'
 import { errorHandler } from '@shared/infrastructure/http/errorHandler.js'
 
 const app = express()
@@ -29,6 +32,9 @@ app.use('/api/v1/restaurants/:restaurantId/ingredients', ingredientRoutes)
 app.use('/api/v1/restaurants/:restaurantId/dishes', dishRoutes)
 app.use('/api/v1/restaurants/:restaurantId/tables', tableRoutes)
 app.use('/api/v1/restaurants/:restaurantId/employees', restaurantEmployeeRoutes)
+app.use('/api/v1/restaurants/:restaurantId/discount-codes', discountCodeRoutes)
+app.use('/api/v1/restaurants/:restaurantId/points-rules', pointsRuleRoutes)
+app.use('/api/v1/restaurants/:restaurantId', pointsRoutes)
 
 app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok' })

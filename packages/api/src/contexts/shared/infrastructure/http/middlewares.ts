@@ -39,3 +39,13 @@ export const authorize = (roles: string[]) => {
         next()
     }
 }
+
+// Admins have no restaurant (restaurantId null) and can operate on any of them;
+// the rest of the roles can only operate on the restaurant in their token.
+export const ensureOwnRestaurant = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (req.user?.role === 'admin' || req.user?.restaurantId === req.params.restaurantId) {
+        next()
+        return
+    }
+    res.status(403).json({ error: 'Forbidden: Restaurant does not match your account' })
+}
