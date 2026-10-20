@@ -64,7 +64,7 @@ import { BillRequestComponent } from './bill-request.component'
 
           <div class="ticket-total">
             <span>Total</span>
-            <strong>{{ getTotal() | number:'1.2-2' }} €</strong>
+            <strong>{{ ticketTotal() | number:'1.2-2' }} €</strong>
           </div>
 
           <div class="ticket-divider"></div>
@@ -183,6 +183,7 @@ import { BillRequestComponent } from './bill-request.component'
 export class OrderDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute)
   private readonly orderService = inject(OrderService)
+  private readonly billStore = inject(BillStore)
   private pollInterval: ReturnType<typeof setInterval> | null = null
 
   readonly order = signal<Order | null>(null)
@@ -214,6 +215,12 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  /** Server total of the requested bill; local sum while there is no bill. */
+  readonly ticketTotal = computed(() => {
+    const bill = this.billStore.summary()
+    return this.billStore.requested() && bill ? bill.total : this.getTotal()
+  })
 
   getTotal(): number {
     const o = this.order()

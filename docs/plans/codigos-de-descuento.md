@@ -97,7 +97,7 @@ Toma como modelo la feature de mesas (`features/tables/`).
 5. [x] **Pedir la cuenta: resumen** — `features/orders/order-detail.component.ts`: botón «Pedir la cuenta» y resumen con subtotal, descuento y total.
 6. [x] **Aplicar código** — mismo componente (o extraer `bill-request.component.ts`): input de código con «Aplicar», previsualización y mensajes por `reason` (inválido, caducado, agotado, mínimo).
 7. [x] **Canjear puntos** — selector de tramos con saldo y equivalencias («100 pts = 10 €»), deshabilitando los tramos que superan el saldo; alterna con el código.
-8. [ ] **Totales coherentes** — `features/orders/my-orders.component.ts` y `order-detail.component.ts`: usar el total de la cuenta si existe, y la suma local si no.
+8. [x] **Totales coherentes** — `features/orders/my-orders.component.ts` y `order-detail.component.ts`: usar el total de la cuenta si existe, y la suma local si no.
 9. [ ] **Verificación** — `npm run build -w @resttek/web-clientes` sin errores y prueba manual de extremo a extremo con la API real.
 
 ## Criterios de aceptación
