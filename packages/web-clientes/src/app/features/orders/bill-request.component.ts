@@ -1,11 +1,12 @@
 import { Component, inject, input, OnInit } from '@angular/core'
 import { DecimalPipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { BillStore } from '../../core/store/bill.store'
 
 @Component({
   selector: 'app-bill-request',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, FormsModule],
   template: `
     <div class="bill">
       @if (store.summary(); as bill) {
@@ -18,6 +19,21 @@ import { BillStore } from '../../core/store/bill.store'
             </div>
           }
           <div class="bill-line bill-total"><span>Total a pagar</span><strong>{{ bill.total | number:'1.2-2' }} €</strong></div>
+        }
+      }
+
+      @if (!store.requested()) {
+        <div class="mode-tabs">
+          <button class="btn btn-secondary" [class.active]="store.mode() === 'code'"
+            (click)="store.setMode(store.mode() === 'code' ? 'none' : 'code')">Tengo un código</button>
+        </div>
+
+        @if (store.mode() === 'code') {
+          <form class="code-form" (ngSubmit)="store.applyCode()">
+            <input name="code" placeholder="Código de descuento" autocomplete="off"
+              [ngModel]="store.code()" (ngModelChange)="store.setCode($event)">
+            <button type="submit" class="btn btn-secondary" [disabled]="store.loading()">Aplicar</button>
+          </form>
         }
       }
 
@@ -45,6 +61,22 @@ import { BillStore } from '../../core/store/bill.store'
       display: flex;
       justify-content: space-between;
       font-size: 14px;
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .mode-tabs .active {
+      border-color: var(--green-medium);
+      color: var(--green-light);
+    }
+    .code-form {
+      display: flex;
+      gap: 8px;
+    }
+    .code-form input {
+      flex: 1;
+      text-transform: uppercase;
     }
     .bill-total {
       font-size: 16px;
