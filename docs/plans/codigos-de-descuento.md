@@ -102,15 +102,15 @@ Toma como modelo la feature de mesas (`features/tables/`).
 
 ## Criterios de aceptación
 
-- [ ] Un admin/manager puede crear, listar, editar y borrar códigos de su restaurante; uno duplicado devuelve 409 y uno de otro restaurante devuelve 403/404.
-- [ ] Un admin/manager puede gestionar los tramos de puntos (10→1 €, 100→10 €...) y un tramo repetido devuelve 409.
-- [ ] `POST /orders/:id/bill` con un código válido devuelve el total con el descuento aplicado, incrementa `uses` y nunca da un total negativo.
-- [ ] `POST /orders/:id/bill` con un tramo de puntos resta los puntos del saldo y aplica el descuento del tramo.
-- [ ] Enviar código y tramo a la vez devuelve 400; código caducado, agotado, inactivo, bajo el mínimo o saldo insuficiente devuelve 422 con su `reason`.
-- [ ] Pedir la cuenta de un pedido ajeno devuelve 403/404 y pedirla dos veces devuelve 409.
+- [x] Un admin/manager puede crear, listar, editar y borrar códigos de su restaurante; uno duplicado devuelve 409 y uno de otro restaurante devuelve 403/404.
+- [x] Un admin/manager puede gestionar los tramos de puntos (10→1 €, 100→10 €...) y un tramo repetido devuelve 409.
+- [x] `POST /orders/:id/bill` con un código válido devuelve el total con el descuento aplicado, incrementa `uses` y nunca da un total negativo.
+- [x] `POST /orders/:id/bill` con un tramo de puntos resta los puntos del saldo y aplica el descuento del tramo.
+- [x] Enviar código y tramo a la vez devuelve 400; código caducado, agotado, inactivo, bajo el mínimo o saldo insuficiente devuelve 422 con su `reason`.
+- [x] Pedir la cuenta de un pedido ajeno devuelve 403/404 y pedirla dos veces devuelve 409.
 - [ ] En web-admin se gestionan códigos y tramos desde el menú del restaurante.
 - [ ] En web-clientes el cliente puede pedir la cuenta, aplicar un código o canjear un tramo, ve el descuento y el total, y recibe mensajes claros ante los errores.
-- [ ] `docs/api/openapi.yaml` documenta todos los endpoints nuevos y `npm test` pasa (incluido `openapi.test.ts`).
+- [x] `docs/api/openapi.yaml` documenta todos los endpoints nuevos y `npm test` pasa (incluido `openapi.test.ts`).
 - [ ] `npm run build` pasa en `web-admin` y `web-clientes`.
 
 ## Riesgos y notas
