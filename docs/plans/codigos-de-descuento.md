@@ -62,7 +62,7 @@ Errores de la cuenta: 400 (código y puntos a la vez, o validación), 404 (pedid
 
 1. [x] **Función pura de cálculo** — `src/services/bill.calculator.ts` + test: subtotal en céntimos, descuento fijo o porcentaje, tope al subtotal, redondeo.
 2. [x] **Errores de dominio** — `src/errors/DomainErrors.ts` y `contexts/shared/infrastructure/http/errorHandler.ts`: errores de código duplicado (409), no encontrado (404) y reglas de cuenta (422), registrados en las listas del `errorHandler`.
-3. [ ] **Modelo de códigos** — `src/models/discount-code.model.ts`: tipos y `assertValid*` (tipo, valor > 0, porcentaje ≤ 100, fechas coherentes).
+3. [x] **Modelo de códigos** — `src/models/discount-code.model.ts`: tipos y `assertValid*` (tipo, valor > 0, porcentaje ≤ 100, fechas coherentes).
 4. [ ] **Migración y repositorio de códigos** — `src/config/database.ts` y `src/repositories/discount-code.repository.ts` + `mocks/`: tabla `discount_codes` con índice único `(restaurant_id, code)`.
 5. [ ] **Servicio de códigos** — `src/services/discount-code.service.ts` + test: CRUD con `ensureRestaurantExists` y unicidad.
 6. [ ] **Rutas de códigos** — `src/controllers/`, `src/routes/discount-code.routes.ts` y `src/app.ts`: montaje en `/api/v1/restaurants/:restaurantId/discount-codes` con `authorize` y comprobación de `restaurantId`.
