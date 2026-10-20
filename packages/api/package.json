@@ -6,7 +6,9 @@
     "dev": "tsx watch src/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "docs:lint": "redocly lint ../../docs/api/openapi.yaml",
+    "docs:build": "redocly build-docs ../../docs/api/openapi.yaml -o ../../docs/api/dist/index.html"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -17,6 +19,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@redocly/cli": "^2.65.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -27,6 +30,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "yaml": "^2.9.1"
   }
 }

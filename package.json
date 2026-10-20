@@ -11,6 +11,7 @@
     "dev:empleados": "npm run start -w @resttek/web-empleados",
     "dev:clientes": "npm run start -w @resttek/web-clientes",
     "test": "npm run test -w @resttek/api",
-    "seed": "npm run seed -w @resttek/api"
+    "seed": "npm run seed -w @resttek/api",
+    "docs:api": "npm run docs:lint -w @resttek/api && npm run docs:build -w @resttek/api"
   }
 }
